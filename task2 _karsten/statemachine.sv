@@ -27,9 +27,9 @@ module statemachine(input logic clk,
 
     always_comb begin : NEXT_STATE_LOGIC
         case (state) 
-            IDLE      : next = (start == 1'b1)                        ? IDLE : DRAW;
+            IDLE      : next = (start == 1'b1)                        ? DRAW : IDLE;
             DRAW      : next = ({x_count,y_count} == {8'd159,7'd119}) ? DONE : DRAW;
-            DONE      : next = (start == 1'b1)                        ? IDLE : DONE;
+            DONE      : next = (start == 1'b0)                        ? IDLE : DONE;
             default   : next = IDLE;
         endcase
     end // NEXT_STATE_LOGIC
@@ -50,7 +50,7 @@ module statemachine(input logic clk,
         vga_x = x_count;
         vga_y = y_count;
         vga_colour = x_count[2:0];
-        x_en = (y_count == 118) ? 1'b1 : 1'b0;
+        x_en = (y_count == 119) ? 1'b1 : 1'b0;
 
         case (state) 
             IDLE :  begin
