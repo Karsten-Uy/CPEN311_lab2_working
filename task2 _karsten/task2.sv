@@ -14,7 +14,7 @@ module task2(input logic CLOCK_50, input logic [3:0] KEY,
     logic [2:0] vga_colour;
     logic vga_plot;
 
-    fillscreen DISPLAY(
+    fillscreen FS(
         .clk           (CLOCK_50),
         .rst_n         (KEY[3]),
         .colour        (),
@@ -25,6 +25,12 @@ module task2(input logic CLOCK_50, input logic [3:0] KEY,
         .vga_colour    (vga_colour),
         .vga_plot      (vga_plot)
     );
+
+    // Internal Outputs
+    assign VGA_X      = vga_x;
+    assign VGA_Y      = vga_y;
+    assign VGA_COLOUR = vga_colour;
+    assign VGA_PLOT   = vga_plot;
 
     vga_adapter#(        
         .RESOLUTION("160x120")) vga_u0(

@@ -49,7 +49,7 @@ module fillscreen_monitor (
     // -----------------------------------------------------------
     // -----------------------------------------------------------
 
-    int screen_colour[string];   // map "x_y" -> colour (0..7)
+    int screen_colour[string];
     int PIXEL_COUNT = 0;
     int DUPLICATE_COUNT = 0;
 
@@ -58,18 +58,19 @@ module fillscreen_monitor (
     int counter;
 
     task monitor_clk_cycles();
-        counter = 0;
-        @(posedge vif.start); // wait until start is asserted
-        counter = 0;          // reset cycle counter
-
         while (phases.run_phase) begin
-            @(posedge vif.clk);
-            counter++;
-            // if ((counter > 19209) && (vif.done != 1'b1)) begin
-            if ((counter > 1909) && (vif.done != 1'b1)) begin
-                $error("More than 19210 cycles needed to draw: %d", counter);
-                ERROR_COUNT++;
-                $stop;
+
+            @(posedge vif.start); // wait until start is asserted
+            counter = 0;          // reset cycle counter
+            
+            while (vif.start) begin
+                @(posedge vif.clk);
+                counter++;
+                if ((counter > 19210) && (vif.done != 1'b1)) begin
+                    $error("More than 19210 cycles needed to draw: %d", counter);
+                    ERROR_COUNT++;
+                    $stop;
+                end
             end
         end
     endtask
@@ -172,7 +173,6 @@ module fillscreen_monitor (
                 if (!screen_colour.exists(key)) begin
                     $error("MISSING pixel at x=%0d y=%0d (expected colour %0d)", x, y, expected_colour);
                     missing++;
-                    $stop();
                 end else begin
                     // Validate colour
                     if (screen_colour[key] !== expected_colour) begin
