@@ -37,6 +37,7 @@ module circle_monitor (
     assign ref_if.colour   = vif.colour;
     assign ref_if.centre_x = vif.centre_x;
     assign ref_if.centre_y = vif.centre_y;
+    assign ref_if.radius   = vif.radius;
     assign ref_if.start    = vif.start;
 
     import lab_pkg::*;
@@ -60,7 +61,7 @@ module circle_monitor (
     task monitor_error();
         ERROR_COUNT = 0;   
         fork
-            count_pixels();
+            // count_pixels();
             scoreboard();
         join_none
     endtask

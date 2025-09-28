@@ -20,6 +20,9 @@ module tb_rtl_circle();
         .clk          (dut_if.clk), 
         .rst_n        (dut_if.rst_n),
         .colour       (dut_if.colour),
+        .centre_x     (dut_if.centre_x),
+        .centre_y     (dut_if.centre_y),
+        .radius       (dut_if.radius),
         .start        (dut_if.start),
         .done         (dut_if.done),
         .vga_x        (dut_if.vga_x),
@@ -28,7 +31,7 @@ module tb_rtl_circle();
         .vga_plot     (dut_if.vga_plot)
     );
 
-    assign dut_if.state = DUT.FSM.state;
+    // assign dut_if.state = DUT.FSM.state;
 
     // -------------------- RUNNING TEST AND COLLECT COVERAGE --------------------
     int ERROR_COUNT = 0;

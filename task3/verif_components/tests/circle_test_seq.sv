@@ -122,12 +122,13 @@ module circle_test_seq (
              ----------------3----------------
         */
 
-        int edge_idx = $urandom_range(0,3));
+        int edge_idx;
+        edge_idx = $urandom_range(0,3);
 
         case (edge_idx)
             'd0: begin vif.centre_x = 0;   vif.centre_y = $urandom_range(0, 119); end
             'd1: begin vif.centre_x = $urandom_range(0, 159); vif.centre_y = 0; end
-            'd2: begin vif.centre_x = 159;  $urandom_range(0, 119); end
+            'd2: begin vif.centre_x = 159; vif.centre_y = $urandom_range(0, 119); end
             'd3: begin vif.centre_x = $urandom_range(0, 159); vif.centre_y = 119; end
         endcase
 
