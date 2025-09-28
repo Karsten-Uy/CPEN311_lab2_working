@@ -43,7 +43,6 @@ module fillscreen_monitor (
     // Consume zero simulation time
     function void report();
         report_screen();
-        report_error();
     endfunction 
 
     // -----------------------------------------------------------
@@ -84,7 +83,6 @@ module fillscreen_monitor (
     task monitor_increment();
         prev_x = 0;
         prev_y = 0;
-        first_pixel = 1; // no previous pixel yet
 
         while (phases.run_phase) begin
             @(posedge vif.clk);
@@ -92,32 +90,45 @@ module fillscreen_monitor (
             curr_x = vif.vga_x;
             curr_y = vif.vga_y;
 
+            if (curr_x == 0 && curr_y == 0) 
+                continue;
+
+            // Only check increments if a pixel is actually plotted
             if (vif.vga_plot) begin
-                if (!first_pixel) begin
-                    // Only check increments if this is NOT the first pixel
-                    if (prev_x == 159) begin
-                        if (curr_x != 0)
-                            $error("curr_x did not wrap: curr_x=%0d prev_x=%0d", curr_x, prev_x);
-                        if (curr_y != prev_y + 1 && prev_y < 119)
-                            $error("curr_y did not increment on line wrap: curr_y=%0d prev_y=%0d", curr_y, prev_y);
-                        if (prev_y == 119 && curr_y != 0)
-                            $error("curr_y did not wrap at frame end: curr_y=%0d prev_y=%0d", curr_y, prev_y);
-                    end else begin
-                        if (curr_x != prev_x + 1)
-                            $error("curr_x increment error: curr_x=%0d prev_x=%0d", curr_x, prev_x);
-                        if (curr_y != prev_y)
-                            $error("curr_y changed unexpectedly: curr_y=%0d prev_y=%0d", curr_y, prev_y);
+                if (curr_x > 159) begin
+                    $error("curr_x > 159: %d", curr_x);
+                    ERROR_COUNT++;
+                end
+                if (curr_y > 119) begin
+                    $error("curr_y > 119: %d", curr_y);
+                    ERROR_COUNT++;
+                end
+
+                if (curr_x != prev_x + ((prev_y == 119) ? 1 : 0)) begin
+                    $error("curr_x != prev_x + ((prev_y == 119) ? 1 : 0): curr_x=%0d prev_x=%0d", curr_x, prev_x);
+                    ERROR_COUNT++;
+                end
+
+                if (prev_y < 119) begin
+                    if (curr_y != prev_y + 1) begin
+                        $error("curr_y != expected increment: curr_y=%0d prev_y=%0d prev_x=%0d", curr_y, prev_y, prev_x);
+                        ERROR_COUNT++;
+                    end
+                end else begin
+                    if (curr_y != 0) begin
+                        $error("curr_y != 0 at frame wrap: curr_y=%0d", curr_y);
+                        ERROR_COUNT++;
                     end
                 end
-                first_pixel = 0; // clear the first pixel flag after first plot
-                prev_x = curr_x;
-                prev_y = curr_y;
             end
+
+            // Always update previous coordinates at the end of clock
+            prev_x = curr_x;
+            prev_y = curr_y;
         end
     endtask
 
     string curr_image;
-
 
     // monitor_fill: record every plotted pixel (sample on clock)
     task monitor_fill();
@@ -126,19 +137,16 @@ module fillscreen_monitor (
         PIXEL_COUNT = 0;
         DUPLICATE_COUNT = 0;
 
-        // keep running while phase active
         while (phases.run_phase) begin
             @(posedge vif.clk);
-            // if a pixel is being plotted this cycle, record it
             if (vif.vga_plot) begin
                 key = $sformatf("%0d_%0d", int'(vif.vga_x), int'(vif.vga_y));
                 if (screen_colour.exists(key)) begin
-                    // duplicate write to same pixel - not necessarily fatal but worth noting
                     $warning("Duplicate pixel write at %s: prev_colour=%0d new_colour=%0d",
                              key, screen_colour[key], vif.vga_colour);
                     DUPLICATE_COUNT++;
                 end else begin
-                    screen_colour[key] = vif.vga_colour; // save colour (0..7)
+                    screen_colour[key] = vif.vga_colour;
                     PIXEL_COUNT++;
                 end
             end
@@ -156,17 +164,17 @@ module fillscreen_monitor (
 
     function void report_screen();
 
-        // iterate all expected coordinates
+        // Model of correct screen here
         for (int x = 0; x < 160; x++) begin
             for (int y = 0; y < 120; y++) begin
                 key = $sformatf("%0d_%0d", int'(x), int'(y));
-                expected_colour = x % 8; // Task 2: colour = x mod 8
+                expected_colour = x % 8; 
                 if (!screen_colour.exists(key)) begin
                     $error("MISSING pixel at x=%0d y=%0d (expected colour %0d)", x, y, expected_colour);
                     missing++;
                     $stop();
                 end else begin
-                    // check the colour
+                    // Validate colour
                     if (screen_colour[key] !== expected_colour) begin
                         $error("COLOUR MISMATCH at x=%0d y=%0d: expected %0d but saw %0d",
                                x, y, expected_colour, screen_colour[key]);
@@ -177,11 +185,14 @@ module fillscreen_monitor (
             end
         end
 
-        // sanity checks and summary
-        if (missing == 0 && colour_mismatches == 0) begin
-            $display("REPORT: Screen fill SUCCESS. All %0d pixels present with correct colours.", seen_total);
-        end else begin
-            $display("REPORT: Screen fill found %0d missing pixels and %0d colour mismatches.", missing, colour_mismatches);
+        if (missing != 0) begin
+            $error("ERROR: Not all pixels have been written to");
+            ERROR_COUNT += missing;
+        end
+
+        if (colour_mismatches != 0) begin
+            $error("ERROR: %d pixels have colour mismatches", colour_mismatches);
+            ERROR_COUNT += colour_mismatches;
         end
 
         // additional diagnostics
@@ -190,14 +201,6 @@ module fillscreen_monitor (
                      PIXEL_COUNT, seen_total, DUPLICATE_COUNT);
         end
 
-        // If anything wrong, increment ERROR_COUNT so testbench can see failure
-        if (missing != 0 || colour_mismatches != 0) begin
-            ERROR_COUNT += (missing + colour_mismatches);
-        end
-
     endfunction
 
-    function void report_error();
-
-    endfunction
 endmodule // fillscreen_monitor
