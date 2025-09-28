@@ -4,16 +4,16 @@ import lab_pkg::*;
 interface fsm_if;
 
     // DUT signals
-    logic clk; 
+    logic clk;
     logic rst_n;
-    logic start; 
-    logic [7:0] x_count; 
-    logic [6:0] y_count; 
+    logic start;
+    logic [7:0] x_count;
+    logic [6:0] y_count;
 
     logic done;
     logic [7:0] vga_x;
     logic [6:0] vga_y;
-    logic [2:0] vga_colour; 
+    logic [2:0] vga_colour;
     logic vga_plot;
     logic x_en;
     logic y_en;
@@ -121,12 +121,10 @@ module fsm_monitor (
                     IDLE : `CHECK(6'b0_0_?_?_1_1)
 
                     DRAW : begin
-                            if (vif.y_count < 7'd118)
+                            if (vif.y_count < 7'd119)
                                 `CHECK(6'b0_1_0_1_0_0)
-                            else if (vif.y_count == 7'd118)
-                                `CHECK(6'b0_1_1_1_0_0)
                             else if (vif.y_count == 7'd119)
-                                `CHECK(6'b0_1_0_1_0_0)
+                                `CHECK(6'b0_1_1_1_0_0)
                             else begin // vif.y_count > 7'd119
                                 $error("vif.y_count > 119"); ERROR_COUNT += 1;
                             end
@@ -176,10 +174,8 @@ module fsm_monitor (
             if (allowed_transitions.exists(state_transition))
                 transition_coverage[state_transition] = 1'b1;
             else begin
-                if(curr_state != "IDLE") begin // Only flag transitions that aren't the reset state
-                    $error("Reached the following invalid state transition: %s", state_transition); 
-                    ERROR_COUNT += 1;
-                end
+                $error("Reached the following invalid state transition: %s", state_transition); 
+                ERROR_COUNT += 1;
             end
         end
     endtask
