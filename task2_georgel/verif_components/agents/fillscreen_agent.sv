@@ -79,6 +79,7 @@ module fillscreen_monitor (
             end
         end
 
+        // Check exp vs axp arrays against each other
         foreach (exp_pixels[i]) begin
             if(!axp_pixels.exists(i)) begin
                 ERROR_COUNT += 1;
@@ -87,7 +88,7 @@ module fillscreen_monitor (
         end
 
         foreach (axp_pixels[i]) begin
-            if(!axp_pixels.exists(i)) begin
+            if(!exp_pixels.exists(i)) begin
                 ERROR_COUNT += 1;
                 $error("%s is not an expected pixel", i);
             end
