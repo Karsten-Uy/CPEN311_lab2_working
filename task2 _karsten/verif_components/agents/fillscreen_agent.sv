@@ -69,7 +69,6 @@ module fillscreen_monitor (
                 if ((counter > 19210) && (vif.done != 1'b1)) begin
                     $error("More than 19210 cycles needed to draw: %d", counter);
                     ERROR_COUNT++;
-                    $stop;
                 end
             end
         end
