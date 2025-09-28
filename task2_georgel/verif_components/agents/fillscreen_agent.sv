@@ -64,8 +64,10 @@ module fillscreen_monitor (
         while (!vif.done) begin
             @(negedge vif.clk);
 
-            pixel_loc = $sformatf("x=%0d,y=%0d", vif.vga_x, vif.vga_y);
-            axp_pixels[pixel_loc] = 1'b1;
+            if (vif.vga_plot) begin
+                pixel_loc = $sformatf("x=%0d,y=%0d", vif.vga_x, vif.vga_y);
+                axp_pixels[pixel_loc] = 1'b1;
+            end
         end
 
         // Get expected array
@@ -81,6 +83,13 @@ module fillscreen_monitor (
             if(!axp_pixels.exists(i)) begin
                 ERROR_COUNT += 1;
                 $error("%s is not found", i);
+            end
+        end
+
+        foreach (axp_pixels[i]) begin
+            if(!axp_pixels.exists(i)) begin
+                ERROR_COUNT += 1;
+                $error("%s is not an expected pixel", i);
             end
         end
 
