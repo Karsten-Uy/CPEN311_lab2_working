@@ -46,6 +46,8 @@ module top_monitor (
             monitor_clk_cycles();
             monitor_increment();
             monitor_fill();
+            monitor_clear();
+            monitor_end_screen();
         join_none
     endtask
 
@@ -58,19 +60,29 @@ module top_monitor (
     // -----------------------------------------------------------
     // -----------------------------------------------------------
 
-    string screen_colour[string]; 
-    int PIXEL_COUNT = 0;
-    int DUPLICATE_COUNT = 0;
+    int screen_colour[string]; 
+    int PIXEL_COUNT;
+    int DUPLICATE_COUNT;
+    int counter;
+
+    // -------------------- VARIBALE SETTING --------------------
+
+    task monitor_clear();
+        while (phases.run_phase) begin
+            @(posedge vif.KEY[0]);
+            screen_colour.delete();
+            PIXEL_COUNT      = 0;
+            DUPLICATE_COUNT  = 0;
+            counter          = 0;
+            $display("[MONITOR] Cleared screen_colour at start");
+        end
+    endtask
 
     // -------------------- MONITORING --------------------
 
-    int counter;
 
     task monitor_clk_cycles();
         while (phases.run_phase) begin
-            @(posedge vif.KEY[0]); // wait until start is asserted
-            counter = 0;          // reset cycle counter
-
             while (vif.KEY[0]) begin
                 @(posedge vif.CLOCK_50);
                 counter++;
@@ -136,42 +148,53 @@ module top_monitor (
         end
     endtask
 
-    string curr_image;
-
     // monitor_fill: record every plotted pixel (sample on clock)
     task monitor_fill();
         string key;
-        PIXEL_COUNT = 0;
-        DUPLICATE_COUNT = 0;
 
         while (phases.run_phase) begin
             @(posedge vif.CLOCK_50);
             if (vif.VGA_PLOT) begin
                 key = $sformatf("%0d_%0d", int'(vif.VGA_X), int'(vif.VGA_Y));
+                // TODO: maybe add intermediate checking, i dont think it is needed tho
                 if (screen_colour.exists(key)) begin
                     $warning("Duplicate pixel write at %s: prev_colour=%0d new_colour=%0d",
                             key, screen_colour[key], int'(vif.VGA_COLOUR));
                     DUPLICATE_COUNT++;
                 end else begin
-                    // screen_colour[key] = int'(vif.VGA_COLOUR);
-                    screen_colour[key] = $sformatf("%0d", vif.VGA_COLOUR);
+                    screen_colour[key] = vif.VGA_COLOUR;
                     PIXEL_COUNT++;
                 end
             end
         end
     endtask
+
+        // monitor_fill: record every plotted pixel (sample on clock)
+    task monitor_end_screen();
+        while (phases.run_phase) begin
+            @(posedge vif.LEDR[0]);
+            report_screen(); // Check screen on done
+        end
+    endtask
             
     // -------------------- Reporting --------------------
 
-    int missing = 0;
-    int colour_mismatches = 0;
+    int missing;
+    int colour_mismatches;
     string key;
     int expected_colour;
-    int seen_total = 0;
+    int seen_total;
 
-    function void report_screen();
+    // function void report_screen();
+    task report_screen();
 
-        // Model of correct screen here
+        missing = 0;
+        colour_mismatches = 0;
+        seen_total = 0;
+
+        $display("checking final screen at %0t", $time);
+
+        // Behaviourly describe and then validate the screen here
         for (int x = 0; x < 160; x++) begin
             for (int y = 0; y < 120; y++) begin
                 key = $sformatf("%0d_%0d", int'(x), int'(y));
@@ -207,6 +230,7 @@ module top_monitor (
                      PIXEL_COUNT, seen_total, DUPLICATE_COUNT);
         end
 
-    endfunction
+    endtask
+    // endfunction
 
 endmodule // fillscreen_monitor
