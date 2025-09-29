@@ -18,8 +18,11 @@ module tb_rtl_task2();
     top_test_seq       test_seq (.vif(dut_if), .phases(phases));
 
     // Test checking and coverage
-    top_monitor        monitor (.vif(dut_if), .phases(phases));
-    fillscreen_monitor fillscreen_monitor(.vif(dut_fillscreen_if), .phases(phases));
+    fillscreen_monitor monitor(.vif(dut_fillscreen_if), .phases(phases));
+       /* 
+        * because we can assign the outputs of fillscreen to outputs of task2, we do NOT need a seperate monitor 
+        * and can just connect it to the fillscreen monitor  
+        */
     fsm_monitor        fsm_monitor(.vif(dut_fsm_if), .phases(phases));
 
     // --------------------  DUT INSTANTIATION --------------------
@@ -46,18 +49,16 @@ module tb_rtl_task2();
         .VGA_PLOT   (dut_if.VGA_PLOT)
     );
     
+    assign dut_fillscreen_if.clk        = DUT.CLOCK_50;
+    assign dut_fillscreen_if.rst_n      = DUT.KEY[3];
+    assign dut_fillscreen_if.start      = DUT.KEY[0];
+    assign dut_fillscreen_if.done       = DUT.LEDR[0];
+    assign dut_fillscreen_if.vga_x      = DUT.VGA_X;
+    assign dut_fillscreen_if.vga_y      = DUT.VGA_Y;
+    assign dut_fillscreen_if.vga_colour = DUT.VGA_COLOUR;
+    assign dut_fillscreen_if.vga_plot   = DUT.VGA_PLOT;
+
     // NOTE: cannot do for GLS
-
-    assign dut_fillscreen_if.clk        = DUT.FS.clk;
-    assign dut_fillscreen_if.rst_n      = DUT.FS.rst_n;
-    assign dut_fillscreen_if.colour     = DUT.FS.colour;
-    assign dut_fillscreen_if.start      = DUT.FS.start;
-    assign dut_fillscreen_if.done       = DUT.FS.done;
-    assign dut_fillscreen_if.vga_x      = DUT.FS.vga_x;
-    assign dut_fillscreen_if.vga_y      = DUT.FS.vga_y;
-    assign dut_fillscreen_if.vga_colour = DUT.FS.vga_colour;
-    assign dut_fillscreen_if.vga_plot   = DUT.FS.vga_plot;
-
     assign dut_fsm_if.state      = DUT.FS.FSM.state;
     assign dut_fsm_if.clk        = DUT.FS.FSM.clk;
     assign dut_fsm_if.rst_n      = DUT.FS.FSM.rst_n;
@@ -84,7 +85,6 @@ module tb_rtl_task2();
         fork
             test_seq.start();
             monitor.start();
-            fillscreen_monitor.start();
             fsm_monitor.start();
         join
 

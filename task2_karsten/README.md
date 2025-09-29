@@ -11,3 +11,15 @@ It is highly recommended that you each work individually on this specific task. 
 - contribution 1
 - contribution 2
 
+## RUN COMMANDS
+
+Run GLS
+```
+vsim work.tb_syn_task2 -L altera_mf_ver -L cyclonev_ver -L altera_ver -L altera_lnsim_ver
+```
+
+Run Normal
+```
+vsim work.tb_rtl_task2 -L altera_mf_ver
+```
+

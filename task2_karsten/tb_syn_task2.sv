@@ -11,13 +11,15 @@ module tb_syn_task2();
     phases     phases();
 
     // Interfaces
-    top_if           dut_if();               
+    top_if           dut_if();    
+    fillscreen_if    dut_fillscreen_if();             
+
 
     // Main DUT stimulus
     top_test_seq       test_seq (.vif(dut_if), .phases(phases));
 
     // Test checking and coverage
-    top_monitor        monitor (.vif(dut_if), .phases(phases));
+    fillscreen_monitor        monitor (.vif(dut_fillscreen_if), .phases(phases));
 
     // --------------------  DUT INSTANTIATION --------------------
     task2 DUT (        
@@ -42,6 +44,15 @@ module tb_syn_task2();
         .VGA_COLOUR (dut_if.VGA_COLOUR),
         .VGA_PLOT   (dut_if.VGA_PLOT)
     );
+    
+    assign dut_fillscreen_if.clk        = DUT.CLOCK_50;
+    assign dut_fillscreen_if.rst_n      = DUT.KEY[3];
+    assign dut_fillscreen_if.start      = DUT.KEY[0];
+    assign dut_fillscreen_if.done       = DUT.LEDR[0];
+    assign dut_fillscreen_if.vga_x      = DUT.VGA_X;
+    assign dut_fillscreen_if.vga_y      = DUT.VGA_Y;
+    assign dut_fillscreen_if.vga_colour = DUT.VGA_COLOUR;
+    assign dut_fillscreen_if.vga_plot   = DUT.VGA_PLOT;
 
     // -------------------- RUNNING TEST AND COLLECT COVERAGE --------------------
 
