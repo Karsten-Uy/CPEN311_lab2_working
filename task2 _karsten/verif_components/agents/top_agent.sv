@@ -23,6 +23,9 @@ interface top_if;
     
 endinterface //datapath_if
 
+
+// TODO: maybe combine fillscreen and top agents into 1
+
 module top_monitor (
     top_if vif,
     phases phases
@@ -60,7 +63,7 @@ module top_monitor (
     // -----------------------------------------------------------
     // -----------------------------------------------------------
 
-    int screen_colour[string]; 
+    int screen_colour[string];
     int PIXEL_COUNT;
     int DUPLICATE_COUNT;
     int counter;
@@ -74,7 +77,6 @@ module top_monitor (
             PIXEL_COUNT      = 0;
             DUPLICATE_COUNT  = 0;
             counter          = 0;
-            $display("[MONITOR] Cleared screen_colour at start");
         end
     endtask
 
@@ -83,10 +85,10 @@ module top_monitor (
 
     task monitor_clk_cycles();
         while (phases.run_phase) begin
-            while (vif.KEY[0]) begin
-                @(posedge vif.CLOCK_50);
+            @(posedge vif.CLOCK_50);
+            if (vif.KEY[0]) begin
                 counter++;
-                if ((counter > 19210) && (vif.LEDR[0] != 1'b1)) begin // TODO: figure out where done goes, currently set to LEDR[0]
+                if ((counter > 19210) && (vif.LEDR[0] != 1'b1)) begin
                     $error("More than 19210 cycles needed to draw: %d", counter);
                     ERROR_COUNT++;
                 end
@@ -99,52 +101,55 @@ module top_monitor (
     logic [7:0] prev_x;
     logic [6:0] prev_y;
     
-    // checks increment and ensure no overflow and all increments
+    // checks increment and ensure no overflow
     task monitor_increment();
-        prev_x = 0;
-        prev_y = 0;
-
         while (phases.run_phase) begin
-            @(posedge vif.CLOCK_50);
+            @(posedge vif.KEY[0]);
+            prev_x = 0;
+            prev_y = 0;
 
-            curr_x = vif.VGA_X;
-            curr_y = vif.VGA_Y;
+            while (vif.KEY[0]) begin
+                @(posedge vif.CLOCK_50);
 
-            if (curr_x == 0 && curr_y == 0) 
-                continue;
+                curr_x = vif.VGA_X;
+                curr_y = vif.VGA_Y;
 
-            // Only check increments if a pixel is actually plotted
-            if (vif.VGA_PLOT) begin
-                if (curr_x > 159) begin
-                    $error("curr_x > 159: %d", curr_x);
-                    ERROR_COUNT++;
-                end
-                if (curr_y > 119) begin
-                    $error("curr_y > 119: %d", curr_y);
-                    ERROR_COUNT++;
-                end
+                if (curr_x == 0 && curr_y == 0)
+                    continue;
 
-                if (curr_x != prev_x + ((prev_y == 119) ? 1 : 0)) begin
-                    $error("curr_x != prev_x + ((prev_y == 119) ? 1 : 0): curr_x=%0d prev_x=%0d", curr_x, prev_x);
-                    ERROR_COUNT++;
-                end
-
-                if (prev_y < 119) begin
-                    if (curr_y != prev_y + 1) begin
-                        $error("curr_y != expected increment: curr_y=%0d prev_y=%0d prev_x=%0d", curr_y, prev_y, prev_x);
+                if (vif.VGA_PLOT) begin
+                    if (curr_x > 159) begin
+                        $error("curr_x > 159: %d", curr_x);
                         ERROR_COUNT++;
                     end
-                end else begin
-                    if (curr_y != 0) begin
-                        $error("curr_y != 0 at frame wrap: curr_y=%0d", curr_y);
+                    if (curr_y > 119) begin
+                        $error("curr_y > 119: %d", curr_y);
                         ERROR_COUNT++;
                     end
+
+                    if (curr_x != 159) begin
+                        if (curr_x != prev_x + ((prev_y == 119) ? 1 : 0)) begin
+                            $error("curr_x != prev_x + ((prev_y == 119) ? 1 : 0): curr_x=%0d prev_x=%0d", curr_x, prev_x);
+                            ERROR_COUNT++;
+                        end
+
+                        if (prev_y < 119) begin
+                            if (curr_y != prev_y + 1) begin
+                                $error("curr_y != expected increment: curr_y=%0d prev_y=%0d prev_x=%0d", curr_y, prev_y, prev_x);
+                                ERROR_COUNT++;
+                            end
+                        end else begin
+                            if (curr_y != 0) begin
+                                $error("curr_y != 0 at frame wrap: curr_y=%0d", curr_y);
+                                ERROR_COUNT++;
+                            end
+                        end
+                    end
                 end
+
+                prev_x = curr_x;
+                prev_y = curr_y;
             end
-
-            // Always update previous coordinates at the end of clock
-            prev_x = curr_x;
-            prev_y = curr_y;
         end
     endtask
 
@@ -169,7 +174,6 @@ module top_monitor (
         end
     endtask
 
-        // monitor_fill: record every plotted pixel (sample on clock)
     task monitor_end_screen();
         while (phases.run_phase) begin
             @(posedge vif.LEDR[0]);
@@ -224,7 +228,6 @@ module top_monitor (
             ERROR_COUNT += colour_mismatches;
         end
 
-        // additional diagnostics
         if (seen_total != PIXEL_COUNT) begin
             $warning("Pixel counts differ: recorded PIXEL_COUNT=%0d unique seen_total=%0d DUPLICATE_COUNT=%0d",
                      PIXEL_COUNT, seen_total, DUPLICATE_COUNT);

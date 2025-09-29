@@ -37,12 +37,14 @@ module fillscreen_monitor (
             monitor_clk_cycles();
             monitor_increment();
             monitor_fill();
+            monitor_clear();
+            monitor_end_screen();
         join_none
     endtask
 
     // Consume zero simulation time
     function void report();
-        report_screen();
+        // report_screen();
     endfunction 
 
     // -----------------------------------------------------------
@@ -50,21 +52,29 @@ module fillscreen_monitor (
     // -----------------------------------------------------------
 
     int screen_colour[string];
-    int PIXEL_COUNT = 0;
-    int DUPLICATE_COUNT = 0;
+    int PIXEL_COUNT;
+    int DUPLICATE_COUNT;
+    int counter;
+
+    // -------------------- VARIBALE SETTING --------------------
+
+    task monitor_clear();
+        while (phases.run_phase) begin
+            @(posedge vif.start);
+            screen_colour.delete();
+            PIXEL_COUNT      = 0;
+            DUPLICATE_COUNT  = 0;
+            counter          = 0;
+        end
+    endtask
 
     // -------------------- MONITORING --------------------
 
-    int counter;
 
     task monitor_clk_cycles();
         while (phases.run_phase) begin
-
-            @(posedge vif.start); // wait until start is asserted
-            counter = 0;          // reset cycle counter
-            
-            while (vif.start) begin
-                @(posedge vif.clk);
+            @(posedge vif.clk);            
+            if (vif.start) begin
                 counter++;
                 if ((counter > 19210) && (vif.done != 1'b1)) begin
                     $error("More than 19210 cycles needed to draw: %d", counter);
@@ -81,61 +91,58 @@ module fillscreen_monitor (
     
     // checks increment and ensure no overflow and all increments
     task monitor_increment();
-        prev_x = 0;
-        prev_y = 0;
-
         while (phases.run_phase) begin
-            @(posedge vif.clk);
+            @(posedge vif.start);
+            prev_x = 0;
+            prev_y = 0;
 
-            curr_x = vif.vga_x;
-            curr_y = vif.vga_y;
+            while(vif.start) begin
+                @(posedge vif.clk);
+                curr_x = vif.vga_x;
+                curr_y = vif.vga_y;
 
-            if (curr_x == 0 && curr_y == 0) 
-                continue;
+                if (curr_x == 0 && curr_y == 0)
+                    continue;
 
-            // Only check increments if a pixel is actually plotted
-            if (vif.vga_plot) begin
-                if (curr_x > 159) begin
-                    $error("curr_x > 159: %d", curr_x);
-                    ERROR_COUNT++;
-                end
-                if (curr_y > 119) begin
-                    $error("curr_y > 119: %d", curr_y);
-                    ERROR_COUNT++;
-                end
-
-                if (curr_x != prev_x + ((prev_y == 119) ? 1 : 0)) begin
-                    $error("curr_x != prev_x + ((prev_y == 119) ? 1 : 0): curr_x=%0d prev_x=%0d", curr_x, prev_x);
-                    ERROR_COUNT++;
-                end
-
-                if (prev_y < 119) begin
-                    if (curr_y != prev_y + 1) begin
-                        $error("curr_y != expected increment: curr_y=%0d prev_y=%0d prev_x=%0d", curr_y, prev_y, prev_x);
+                if (vif.vga_plot) begin
+                    if (curr_x > 159) begin
+                        $error("curr_x > 159: %d", curr_x);
                         ERROR_COUNT++;
                     end
-                end else begin
-                    if (curr_y != 0) begin
-                        $error("curr_y != 0 at frame wrap: curr_y=%0d", curr_y);
+                    if (curr_y > 119) begin
+                        $error("curr_y > 119: %d", curr_y);
                         ERROR_COUNT++;
                     end
+
+                    if (curr_x != 159) begin
+                        if (curr_x != prev_x + ((prev_y == 119) ? 1 : 0)) begin
+                            $error("curr_x != prev_x + ((prev_y == 119) ? 1 : 0): curr_x=%0d prev_x=%0d", curr_x, prev_x);
+                            ERROR_COUNT++;
+                        end
+
+                        if (prev_y < 119) begin
+                            if (curr_y != prev_y + 1) begin
+                                $error("curr_y != expected increment: curr_y=%0d prev_y=%0d prev_x=%0d", curr_y, prev_y, prev_x);
+                                ERROR_COUNT++;
+                            end
+                        end else begin
+                            if (curr_y != 0) begin
+                                $error("curr_y != 0 at frame wrap: curr_y=%0d", curr_y);
+                                ERROR_COUNT++;
+                            end
+                        end
+                    end
                 end
+
+                prev_x = curr_x;
+                prev_y = curr_y;
             end
-
-            // Always update previous coordinates at the end of clock
-            prev_x = curr_x;
-            prev_y = curr_y;
         end
     endtask
 
-    string curr_image;
-
     // monitor_fill: record every plotted pixel (sample on clock)
     task monitor_fill();
-
         string key;
-        PIXEL_COUNT = 0;
-        DUPLICATE_COUNT = 0;
 
         while (phases.run_phase) begin
             @(posedge vif.clk);
@@ -151,20 +158,33 @@ module fillscreen_monitor (
                 end
             end
         end
+    endtask
 
+    task monitor_end_screen();
+        while (phases.run_phase) begin
+            @(posedge vif.done);
+            report_screen(); // Check screen on done
+        end
     endtask
         
     // -------------------- Reporting --------------------
 
-    int missing = 0;
-    int colour_mismatches = 0;
+    int missing;
+    int colour_mismatches;
     string key;
     int expected_colour;
-    int seen_total = 0;
+    int seen_total;
 
-    function void report_screen();
+    // function void report_screen();
+    task report_screen();
 
-        // Model of correct screen here
+        missing = 0;
+        colour_mismatches = 0;
+        seen_total = 0;
+
+        $display("checking final screen at %0t", $time);
+
+        // Behaviourly describe and then validate the screen here
         for (int x = 0; x < 160; x++) begin
             for (int y = 0; y < 120; y++) begin
                 key = $sformatf("%0d_%0d", int'(x), int'(y));
@@ -200,6 +220,7 @@ module fillscreen_monitor (
                      PIXEL_COUNT, seen_total, DUPLICATE_COUNT);
         end
 
-    endfunction
+    endtask
+    // endfunction
 
 endmodule // fillscreen_monitor

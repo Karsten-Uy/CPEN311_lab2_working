@@ -29,12 +29,17 @@ module fillscreen_test_seq (
 
     task run();
 
-        vif.start = 1'b0;
-        @(posedge vif.clk);
-        vif.start = 1'b1;
+        repeat(3) begin
 
-        repeat(19210)
+            vif.start = 1'b1;
+
+            repeat(19210)
+                @(posedge vif.clk);            
+            
+            vif.start = 1'b0;
             @(posedge vif.clk);
+
+        end
         
     endtask
 
