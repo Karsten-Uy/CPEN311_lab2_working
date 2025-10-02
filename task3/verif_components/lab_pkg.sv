@@ -3,6 +3,10 @@ package lab_pkg;
     ///////////////////////////////////////////////////////////
     // circle assets
 
+    parameter VGA_X_DW  = 7; 
+    parameter VGA_Y_DW  = 6; 
+    parameter RADIUS_DW = 7;
+
     `define FSM_SWIDTH_CIRCLE 4
 
     typedef enum logic [`FSM_SWIDTH_CIRCLE-1:0] { 

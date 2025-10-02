@@ -3,7 +3,10 @@ module circle(input logic clk, input logic rst_n, input logic [2:0] colour,
               input logic start, output logic done,
               output logic [7:0] vga_x, output logic [6:0] vga_y,
               output logic [2:0] vga_colour, output logic vga_plot);
-     // draw the circle
+     
+     // ---------------- PACKAGE IMPORTS ----------------
+     import lab_pkg::*;
+
 
      // FSM Signals
      logic unsigned       fill_start;
@@ -20,7 +23,11 @@ module circle(input logic clk, input logic rst_n, input logic [2:0] colour,
      logic signed  [6:0]  offset_y;
      logic signed  [7:0]  crit;
 
-     datapath DP(
+     datapath #(
+          .VGA_X_DW  (VGA_X_DW),
+          .VGA_Y_DW  (VGA_Y_DW),  
+          .RADIUS_DW (RADIUS_DW)
+     ) DP (
           .clk         (clk),
           .resetn      (resetn),
           .radius      (radius),
@@ -46,7 +53,11 @@ module circle(input logic clk, input logic rst_n, input logic [2:0] colour,
           .plot        (vga_plot)
      );
 
-     circle_fsm CIRCLE_FSM(
+     circle_fsm #(
+          .VGA_X_DW  (VGA_X_DW),
+          .VGA_Y_DW  (VGA_Y_DW),  
+          .RADIUS_DW (RADIUS_DW)
+     ) CIRCLE_FSM (
           .clk         (clk),
           .rst_n       (rst_n),
           .colour      (colour),

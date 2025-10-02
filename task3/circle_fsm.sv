@@ -1,20 +1,29 @@
 
-module circle_fsm(
+module circle_fsm #(
+    parameter VGA_X_DW  = 7, 
+    parameter VGA_Y_DW  = 6, 
+    parameter RADIUS_DW = 7,
+    parameter CRIT_DW   = RADIUS_DW+1, // unsigned so +1 in size
+
+    // Set offsets and octant such that they're X widths + 1
+    parameter OFFSET_X_DW = VGA_X_DW + 1,
+    parameter OFFSET_Y_DW = VGA_Y_DW + 1
+)(
 
     // From circle
     input logic clk, 
     input logic rst_n, 
     input logic [2:0] colour,
-    input logic [7:0] centre_x, 
-    input logic [6:0] centre_y,
-    input logic [7:0] radius,
+    input logic [VGA_X_DW-1:0] centre_x, 
+    input logic [VGA_Y_DW-1:0] centre_y,
+    input logic [RADIUS_DW-1:0] radius,
     input logic start,
 
     // From Datapath
-    input logic signed [7:0] curr_crit,
+    input logic signed [CRIT_DW-1:0] curr_crit,
     input logic fill_done,
-    input logic signed [7:0] offset_x,
-    input logic signed [6:0] offset_y,
+    input logic signed [OFFSET_X_DW-1:0] offset_x,
+    input logic signed [OFFSET_Y_DW-1:0] offset_y,
 
     // To Circle
     output logic done,
