@@ -3,7 +3,7 @@ module datapath #(
     parameter VGA_X_DW = 7, 
     parameter VGA_Y_DW = 6, 
     parameter RADIUS_DW = 7,
-    parameter CRIT_DW   = RADIUS_DW+1,
+    parameter CRIT_DW   = RADIUS_DW+1, // unsigned so +1 in size
 
     // Set offsets and octant such that they're X widths + 1
     parameter OCT_X_DW = VGA_X_DW + 1,
@@ -15,9 +15,9 @@ module datapath #(
     input   logic       resetn,
 
     // From top
-    input   logic unsigned [RADIUS_DW-1:0] radius,
-    input   logic unsigned [VGA_X_DW-1:0] centre_x,
-    input   logic unsigned [VGA_Y_DW-1:0] centre_y,
+    input   logic signed [RADIUS_DW-1:0] radius,
+    input   logic signed [VGA_X_DW-1:0]  centre_x,
+    input   logic signed [VGA_Y_DW-1:0]  centre_y,
 
     // FSM signals
     input   logic unsigned        fill_start,
