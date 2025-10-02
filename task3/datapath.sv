@@ -2,6 +2,8 @@
 module datapath #(
     parameter VGA_X_DW = 7, 
     parameter VGA_Y_DW = 6, 
+    parameter RADIUS_DW = 7,
+    parameter CRIT_DW   = RADIUS_DW+1,
 
     // Set offsets and octant such that they're X widths + 1
     parameter OCT_X_DW = VGA_X_DW + 1,
@@ -13,9 +15,9 @@ module datapath #(
     input   logic       resetn,
 
     // From top
-    input   logic unsigned [4:0] radius,
-    input   logic unsigned [4:0] centre_x,
-    input   logic unsigned [4:0] centre_y,
+    input   logic unsigned [RADIUS_DW-1:0] radius,
+    input   logic unsigned [VGA_X_DW-1:0] centre_x,
+    input   logic unsigned [VGA_Y_DW-1:0] centre_y,
 
     // FSM signals
     input   logic unsigned        fill_start,
@@ -30,7 +32,7 @@ module datapath #(
     input   logic unsigned        load_crit,
     output  logic signed  [OFFSET_X_DW-1:0] offset_x,  
     output  logic signed  [OFFSET_Y_DW-1:0] offset_y,  
-    output  logic signed  [5:0] crit,
+    output  logic signed  [CRIT_DW-1:0] crit,
 
     // To top
     output  logic unsigned [VGA_X_DW-1:0] vga_x,
@@ -39,12 +41,12 @@ module datapath #(
 );
 
     // ---------------- INTERNAL SIGNALS ----------------
-    logic signed   [5:0] next_crit;
+    logic signed   [CRIT_DW-1:0] next_crit;
 
-    logic unsigned [7:0] circle_x; 
-    logic unsigned [6:0] circle_y;
-    logic unsigned [7:0] clear_x; 
-    logic unsigned [6:0] clear_y;
+    logic unsigned [VGA_X_DW-1:0] circle_x; 
+    logic unsigned [VGA_Y_DW-1:0] circle_y;
+    logic unsigned [VGA_X_DW-1:0] clear_x; 
+    logic unsigned [VGA_Y_DW-1:0] clear_y;
     logic unsigned       circle_plot;
     logic unsigned       fillscreen_plot;
 
