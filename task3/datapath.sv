@@ -1,43 +1,44 @@
 
 module datapath #(
-    parameter VGA_X_DW = 7, 
-    parameter VGA_Y_DW = 6, 
+    parameter VGA_X_DW  = 7, 
+    parameter VGA_Y_DW  = 6, 
     parameter RADIUS_DW = 7,
     parameter CRIT_DW   = RADIUS_DW+1, // unsigned so +1 in size
 
     // Set offsets and octant such that they're X widths + 1
-    parameter OCT_X_DW = VGA_X_DW + 1,
-    parameter OCT_Y_DW = VGA_Y_DW + 1,
+    parameter OCT_X_DW    = VGA_X_DW + 1,
+    parameter OCT_Y_DW    = VGA_Y_DW + 1,
     parameter OFFSET_X_DW = VGA_X_DW + 1,
     parameter OFFSET_Y_DW = VGA_Y_DW + 1
 )(
+    // Global clk and active-low reset
     input   logic       clk,
     input   logic       resetn,
 
     // From top
-    input   logic signed [RADIUS_DW-1:0] radius,
-    input   logic signed [VGA_X_DW-1:0]  centre_x,
-    input   logic signed [VGA_Y_DW-1:0]  centre_y,
+    input   logic signed [RADIUS_DW-1:0]    radius,
+    input   logic signed [VGA_X_DW-1 :0]    centre_x,
+    input   logic signed [VGA_Y_DW-1 :0]    centre_y,
 
     // FSM signals
-    input   logic unsigned        fill_start,
-    output  logic unsigned        fill_done,
-    input   logic unsigned        draw_circle,
-    input   logic unsigned  [2:0] octant_sel, // binary select mux for 0-7
-    input   logic unsigned        dec_x,
-    input   logic unsigned        inc_y,
-    input   logic unsigned        calc_crit,
-    input   logic unsigned        load_x,
-    input   logic unsigned        load_y,
-    input   logic unsigned        load_crit,
+    input   logic unsigned                  fill_start,
+    output  logic unsigned                  fill_done,
+    input   logic unsigned                  draw_circle,
+    input   logic unsigned [2:0]            octant_sel, // binary select mux for 0-7
+    input   logic unsigned                  dec_x,
+    input   logic unsigned                  inc_y,
+    input   logic unsigned                  calc_crit,
+    input   logic unsigned                  load_x,
+    input   logic unsigned                  load_y,
+    input   logic unsigned                  load_crit,
     output  logic signed  [OFFSET_X_DW-1:0] offset_x,  
     output  logic signed  [OFFSET_Y_DW-1:0] offset_y,  
-    output  logic signed  [CRIT_DW-1:0] crit,
+    output  logic signed  [CRIT_DW-1    :0] crit,
 
     // To top
-    output  logic unsigned [VGA_X_DW-1:0] vga_x,
-    output  logic unsigned [VGA_Y_DW-1:0] vga_y,
-    output  logic unsigned       plot
+    output  logic unsigned [VGA_X_DW-1:0]   vga_x,
+    output  logic unsigned [VGA_Y_DW-1:0]   vga_y,
+    output  logic unsigned                  plot
 );
 
     // ---------------- INTERNAL SIGNALS ----------------
@@ -47,8 +48,8 @@ module datapath #(
     logic unsigned [VGA_Y_DW-1:0] circle_y;
     logic unsigned [VGA_X_DW-1:0] clear_x; 
     logic unsigned [VGA_Y_DW-1:0] clear_y;
-    logic unsigned       circle_plot;
-    logic unsigned       fillscreen_plot;
+    logic unsigned                circle_plot;
+    logic unsigned                fillscreen_plot;
 
     logic signed [OCT_X_DW-1:0] oct1_x;
     logic signed [OCT_X_DW-1:0] oct2_x;
@@ -91,7 +92,7 @@ module datapath #(
 
     always_ff @( posedge clk ) begin : REG__crit
         if(!resetn)         crit  <= 'b0;
-        else if (calc_crit) crit  <= 'b1 - radius;
+        else if (load_crit) crit  <= 'b1 - radius;
         else if (calc_crit)  begin
             if (crit <= 'b0) crit = crit + 'd2 * offset_y + 'b1;
             else             crit = crit + 'd2 * (offset_y - offset_x) + 'b1;
@@ -99,6 +100,8 @@ module datapath #(
     end
 
     // ---------------- ALU ----------------
+
+    // Implements the Bresenham Circle Algorithm for each octant x/y
     always_comb begin : octant_ALU 
         oct1_x = centre_x + offset_x;
         oct2_x = centre_x + offset_y;
