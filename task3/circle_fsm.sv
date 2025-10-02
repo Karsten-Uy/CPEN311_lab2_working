@@ -1,5 +1,7 @@
 
 module circle_fsm(
+
+    // From circle
     input logic clk, 
     input logic rst_n, 
     input logic [2:0] colour,
@@ -7,12 +9,18 @@ module circle_fsm(
     input logic [6:0] centre_y,
     input logic [7:0] radius,
     input logic start,
-    input logic signed [8:0] curr_crit,
+
+    // From Datapath
+    input logic signed [7:0] curr_crit,
     input logic fill_done,
-    input logic signed [8:0] offset_x,
-    input logic signed [8:0] offset_y,
+    input logic signed [7:0] offset_x,
+    input logic signed [6:0] offset_y,
+
+    // To Circle
     output logic done,
     output logic [2:0] vga_colour,
+
+    // To Datapath
     output logic draw_circle,
     output logic [2:0] octant_sel,
     output logic fill_start,
