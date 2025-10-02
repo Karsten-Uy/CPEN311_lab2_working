@@ -1,6 +1,5 @@
 module fillscreen(input logic clk,
                   input logic rst_n,
-                  input logic [2:0] colour,
                   input logic start,
                   output logic done,
                   output logic [7:0] vga_x, 

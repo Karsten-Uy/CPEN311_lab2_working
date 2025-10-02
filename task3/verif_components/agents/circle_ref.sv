@@ -25,6 +25,7 @@ module circle_ref (circle_if vif, phases phases);
         // Clear Screen
         $display("[ref_model] Running clear screen");
         vif.ref_state = CLEAR_SCREEN;
+        vif.plot = 1'b1;
         for (int x = 0; x <= 159; x++) begin
             for (int y = 0; y <= 119; y++) begin
                 @(posedge vif.clk) begin
@@ -71,11 +72,22 @@ module circle_ref (circle_if vif, phases phases);
 
     task setPixel(int vga_x, int vga_y);
         @(posedge vif.clk) begin
-            vif.vga_x <= vga_x;
-            vif.vga_y <= vga_y;
-        end
-        $display("[ref_model] x=%0d,y=%0d", vga_x, vga_y);
+            if (vga_x >= 0 && vga_x <= 159) vif.vga_x <= vga_x;
+            else                            vif.vga_x <= 'b0;
 
+            if (vga_y >= 0 && vga_x <= 119) vif.vga_y <= vga_y;
+            else                            vif.vga_y <= 'b0;
+
+            if (vga_x >= 0 && vga_x <= 159 &&
+                vga_y >= 0 && vga_y <= 119) begin
+                vif.plot <= 1'b1;
+            end else begin
+                vif.plot <= 1'b0;
+            end
+
+        end
+        @(negedge vif.clk);
+        $display("[ref_model] x=%0d,y=%0d", vif.vga_x, vif.vga_y);
     endtask
 
 endmodule
