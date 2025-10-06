@@ -1,13 +1,12 @@
 
 module datapath #(
-    parameter VGA_X_DW  = 7, 
-    parameter VGA_Y_DW  = 6, 
-    parameter RADIUS_DW = 7,
+    parameter VGA_X_DW  = 8, 
+    parameter VGA_Y_DW  = 7, 
+    parameter RADIUS_DW = 8,
     parameter CRIT_DW   = RADIUS_DW+1, // unsigned so +1 in size
 
     // Set offsets and octant such that they're X widths + 1
-    parameter OCT_X_DW    = VGA_X_DW + 1,
-    parameter OCT_Y_DW    = VGA_Y_DW + 1,
+    parameter OCT_DW      = VGA_X_DW + 1,
     parameter OFFSET_X_DW = VGA_X_DW + 1,
     parameter OFFSET_Y_DW = VGA_Y_DW + 1
 )(
@@ -16,9 +15,9 @@ module datapath #(
     input   logic       resetn,
 
     // From top
-    input   logic signed [RADIUS_DW-1:0]    radius,
-    input   logic signed [VGA_X_DW-1 :0]    centre_x,
-    input   logic signed [VGA_Y_DW-1 :0]    centre_y,
+    input   logic signed [8:0]    radius,
+    input   logic signed [8:0]    centre_x,
+    input   logic signed [7:0]    centre_y,
 
     // FSM signals
     input   logic unsigned                  fill_start,
@@ -42,7 +41,7 @@ module datapath #(
 );
 
     // ---------------- INTERNAL SIGNALS ----------------
-    logic signed   [CRIT_DW-1:0] next_crit;
+    // logic signed   [CRIT_DW-1:0] next_crit;
 
     logic unsigned [VGA_X_DW-1:0] circle_x; 
     logic unsigned [VGA_Y_DW-1:0] circle_y;
@@ -51,25 +50,25 @@ module datapath #(
     logic unsigned                circle_plot;
     logic unsigned                fillscreen_plot;
 
-    logic signed [OCT_X_DW-1:0] oct1_x;
-    logic signed [OCT_X_DW-1:0] oct2_x;
-    logic signed [OCT_X_DW-1:0] oct3_x;
-    logic signed [OCT_X_DW-1:0] oct4_x;
-    logic signed [OCT_X_DW-1:0] oct5_x;
-    logic signed [OCT_X_DW-1:0] oct6_x;
-    logic signed [OCT_X_DW-1:0] oct7_x;
-    logic signed [OCT_X_DW-1:0] oct8_x;
-    logic signed [OCT_X_DW-1:0] circle_int_x;
+    logic signed [OCT_DW-1:0] oct1_x;
+    logic signed [OCT_DW-1:0] oct2_x;
+    logic signed [OCT_DW-1:0] oct3_x;
+    logic signed [OCT_DW-1:0] oct4_x;
+    logic signed [OCT_DW-1:0] oct5_x;
+    logic signed [OCT_DW-1:0] oct6_x;
+    logic signed [OCT_DW-1:0] oct7_x;
+    logic signed [OCT_DW-1:0] oct8_x;
+    logic signed [OCT_DW-1:0] circle_int_x;
 
-    logic signed [OCT_Y_DW-1:0] oct1_y;
-    logic signed [OCT_Y_DW-1:0] oct2_y;
-    logic signed [OCT_Y_DW-1:0] oct3_y;
-    logic signed [OCT_Y_DW-1:0] oct4_y;
-    logic signed [OCT_Y_DW-1:0] oct5_y;
-    logic signed [OCT_Y_DW-1:0] oct6_y;
-    logic signed [OCT_Y_DW-1:0] oct7_y;
-    logic signed [OCT_Y_DW-1:0] oct8_y;
-    logic signed [OCT_Y_DW-1:0] circle_int_y;
+    logic signed [OCT_DW-1:0] oct1_y;
+    logic signed [OCT_DW-1:0] oct2_y;
+    logic signed [OCT_DW-1:0] oct3_y;
+    logic signed [OCT_DW-1:0] oct4_y;
+    logic signed [OCT_DW-1:0] oct5_y;
+    logic signed [OCT_DW-1:0] oct6_y;
+    logic signed [OCT_DW-1:0] oct7_y;
+    logic signed [OCT_DW-1:0] oct8_y;
+    logic signed [OCT_DW-1:0] circle_int_y;
 
     // ---------------- TOP LEVEL MUX ----------------
     assign vga_x = (draw_circle) ? circle_x   : clear_x;
@@ -94,8 +93,8 @@ module datapath #(
         if(!resetn)         crit  <= 'b0;
         else if (load_crit) crit  <= 'b1 - radius;
         else if (calc_crit)  begin
-            if (crit <= 'b0) crit = crit + 'd2 * offset_y + 'b1;
-            else             crit = crit + 'd2 * (offset_y - offset_x) + 'b1;
+            if (crit <= 'sb0) crit <= crit + 'sd2 * (offset_y+'sb1) + 'sb1;
+            else              crit <= crit + 'sd2 * (offset_y+'sb1 - (offset_x-'sb1)) + 'sb1;
         end
     end
 

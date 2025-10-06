@@ -19,9 +19,17 @@ module circle(input logic clk, input logic rst_n, input logic [2:0] colour,
      logic unsigned       load_x;
      logic unsigned       load_y;
      logic unsigned       load_crit;
-     logic signed  [7:0]  offset_x;
-     logic signed  [6:0]  offset_y;
-     logic signed  [7:0]  crit;
+     logic signed  [8:0]  offset_x;
+     logic signed  [7:0]  offset_y;
+     logic signed  [8:0]  crit;
+
+     logic signed  [8:0]  centre_x_sgn;
+     logic signed  [7:0]  centre_y_sgn;
+     logic signed  [8:0]  radius_sgn;
+
+     assign centre_x_sgn = {1'b0, centre_x};
+     assign centre_y_sgn = {1'b0, centre_y};
+     assign radius_sgn   = {1'b0, radius};
 
      datapath #(
           .VGA_X_DW  (VGA_X_DW),
@@ -30,9 +38,9 @@ module circle(input logic clk, input logic rst_n, input logic [2:0] colour,
      ) DP (
           .clk         (clk),
           .resetn      (resetn),
-          .radius      (radius),
-          .centre_x    (centre_x),
-          .centre_y    (centre_y),
+          .radius      (radius_sgn),
+          .centre_x    (centre_x_sgn),
+          .centre_y    (centre_y_sgn),
 
           .fill_start  (fill_start),
           .fill_done   (fill_done),
@@ -61,9 +69,9 @@ module circle(input logic clk, input logic rst_n, input logic [2:0] colour,
           .clk         (clk),
           .rst_n       (rst_n),
           .colour      (colour),
-          .centre_x    (centre_x),
-          .centre_y    (centre_y),
-          .radius      (radius),
+          // .centre_x    (centre_x),
+          // .centre_y    (centre_y),
+          // .radius      (radius_signed),
           .start       (start),
 
           .curr_crit   (crit),
