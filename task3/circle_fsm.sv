@@ -5,16 +5,16 @@ module circle_fsm(
     input logic clk, 
     input logic rst_n, 
     input logic [2:0] colour,
-    input logic [7:0] centre_x, 
-    input logic [6:0] centre_y,
-    input logic [7:0] radius,
+    // input logic [7:0] centre_x, 
+    // input logic [6:0] centre_y,
+    // input logic [8:0] radius,
     input logic start,
 
     // From Datapath
-    input logic signed [7:0] curr_crit,
+    input logic signed [8:0] curr_crit,
     input logic fill_done,
-    input logic signed [7:0] offset_x,
-    input logic signed [6:0] offset_y,
+    input logic signed [8:0] offset_x,
+    input logic signed [7:0] offset_y,
 
     // To Circle
     output logic done,
@@ -57,7 +57,7 @@ module circle_fsm(
             CIRCLE_OCT5  : next = CIRCLE_OCT6;
             CIRCLE_OCT6  : next = CIRCLE_OCT7;
             CIRCLE_OCT7  : next = CIRCLE_OCT8;
-            CIRCLE_OCT8  : next = (offset_y <= offset_x) ? CIRCLE_OCT1 : CIRCLE_DONE;
+            CIRCLE_OCT8  : next = (offset_y+'sb1 <= offset_x-'sb1) ? CIRCLE_OCT1 : CIRCLE_DONE;
             CIRCLE_DONE  : next = (start == 1'd1) ? CIRCLE_DONE : CIRCLE_IDLE;
             default      : next = CIRCLE_IDLE;
         endcase
