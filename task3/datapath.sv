@@ -83,14 +83,14 @@ module datapath #(
     // ---------------- OFFSET/CRIT REGISTERS ----------------
 
     always_ff @( posedge clk ) begin : REG__offset_x 
-        if(!resetn)           offset_x <= 'b0;
+        if(!resetn)           offset_x <= 'sb0;
         else if (load_x_init) offset_x <= radius;
         else if (load_x_next) offset_x <= calc_offset_x;
     end
 
     always_ff @( posedge clk ) begin : REG__offset_y 
-        if(!resetn)           offset_y <= 'b0;
-        else if (load_y_init) offset_y <= 'b0;
+        if(!resetn)           offset_y <= 'sb0;
+        else if (load_y_init) offset_y <= 'sb0;
         else if (load_y_next) offset_y <= calc_offset_y;
     end
 
@@ -100,18 +100,18 @@ module datapath #(
     //                 when I do this????? idk why will look into this later
 
     always_ff @( posedge clk ) begin : REG__crit_offset_x 
-        if (dec_x) calc_offset_x <= offset_x - 'b1;
+        if (dec_x) calc_offset_x <= offset_x - 'sb1;
         else       calc_offset_x <= offset_x;
     end
 
     always_ff @( posedge clk ) begin : REG__crit_offset_y 
-        if (inc_y)  calc_offset_y <= calc_offset_y + 'b1;
+        if (inc_y)  calc_offset_y <= calc_offset_y + 'sb1;
         else        calc_offset_y <= offset_y;
     end
 
     always_ff @( posedge clk ) begin : REG__crit
-        if(!resetn)         crit  <= 'b0;
-        else if (load_crit) crit  <= 'b1 - radius;
+        if(!resetn)         crit  <= 'sb0;
+        else if (load_crit) crit  <= 'sb1 - radius;
         else if (calc_crit)  begin
             if (crit <= 'sb0) crit <= crit + 'sd2 * (calc_offset_y) + 'sb1;
             else              crit <= crit + 'sd2 * (calc_offset_y - calc_offset_x) + 'sb1;
@@ -163,11 +163,11 @@ module datapath #(
     // Since vga_x and vga_y are positive, signed to unsigned conversion 
     // can be done by removing MSB from circle_int_{x,y}
     always_comb begin : screen_check
-        circle_x = (circle_int_x <= 'd159 && circle_int_x >= 'd0) ? circle_int_x[VGA_X_DW-1:0] : 'b0;
-        circle_y = (circle_int_y <= 'd119 && circle_int_y >= 'd0) ? circle_int_y[VGA_Y_DW-1:0] : 'b0;
+        circle_x = (circle_int_x <= 'sd159 && circle_int_x >= 'sd0) ? circle_int_x[VGA_X_DW-1:0] : 'b0;
+        circle_y = (circle_int_y <= 'sd119 && circle_int_y >= 'sd0) ? circle_int_y[VGA_Y_DW-1:0] : 'b0;
 
-        circle_plot = (circle_int_x <= 'd159 && circle_int_x >= 'd0 &&
-                       circle_int_y <= 'd119 && circle_int_y >= 'd0) ? 1'b1 : 1'b0;
+        circle_plot = (circle_int_x <= 'sd159 && circle_int_x >= 'sd0 &&
+                       circle_int_y <= 'sd119 && circle_int_y >= 'sd0) ? 1'b1 : 1'b0;
     end
 
     // ---------------- FILL_SCREEN INST ----------------

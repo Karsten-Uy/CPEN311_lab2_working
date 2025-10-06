@@ -20,6 +20,7 @@ interface circle_if;
     import lab_pkg::*;
     circle_FSM_state dut_state;
     circle_FSM_state ref_state;
+    bit forced_early_clear;
 
 endinterface //circle_if
 
@@ -39,6 +40,7 @@ module circle_monitor (
     assign ref_if.centre_y = vif.centre_y;
     assign ref_if.radius   = vif.radius;
     assign ref_if.start    = vif.start;
+    assign ref_if.forced_early_clear = vif.forced_early_clear;
 
     import lab_pkg::*;
     import circle_ref_pkg::*;
@@ -123,9 +125,9 @@ module circle_monitor (
             @ (negedge vif.clk); // Synchonization event
             Mismatch = 0;
 
-            if(ref_model.ref_state == circle_ref_pkg::DRAW_CIRCLE) begin
+            if((ref_model.ref_state == circle_ref_pkg::DRAW_CIRCLE) && (ref_if.ref_state != lab_pkg::CIRCLE_BLACK)) begin
                 // Checks that x, y and color match with reference model
-                if (vif.vga_x != ref_if.vga_x) begin
+                if (vif.vga_x != ref_if.vga_x ) begin
                     Mismatch = 1;
                     $error("Mismatch in vga_x. exp=%0d, axp=%0d", ref_if.vga_x, vif.vga_x);
                     ERROR_COUNT += 1;
@@ -139,9 +141,11 @@ module circle_monitor (
             end
 
             // Stop monitoring once both reached done states
-            if(vif.ref_state == REF_DONE) begin
-                if (vif.done != 1'b1) begin
+            if(ref_model.ref_state == circle_ref_pkg::REF_DONE) begin
+                if (vif.done == 1'b0) begin
+                    Mismatch = 1;
                     $error("DUT did not assert done signal");
+                    ERROR_COUNT += 1;
                 end
             end
 

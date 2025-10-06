@@ -5,7 +5,7 @@ module circle_test_seq (
     phases phases
 );
 
-    // import lab_pkg::*;
+    import lab_pkg::*;
 
     // --------------------  DUT SPECIFIC VERIF COMPONENTS --------------------
     rst_clk_if     CLOCK_50_if();
@@ -37,16 +37,29 @@ module circle_test_seq (
         // randomize_corner();
         // randomize_edge();
 
-        // randomize_inside_grid();
+
+        vif.forced_early_clear = 1'b0;
+        randomize_inside_grid();
+        randomize_inside_grid();
 
         repeat(10) begin
-            randomize_inside_grid(); 
+            randomize_inside_grid(.early_clear(1)); 
         end
 
     endtask
 
     task force_early_clear();
+        vif.forced_early_clear = 1'b1;
         // Use to force DUT state to skip CLEAR_SCREEN state once it's been verified
+        if (DUT.CIRCLE_FSM.state != CIRCLE_BLACK) begin
+            @(DUT.CIRCLE_FSM.state == CIRCLE_BLACK) begin
+                @(posedge vif.clk);
+                @(posedge vif.clk);
+                force DUT.CIRCLE_FSM.state = CIRCLE_OCT1;
+                @(posedge vif.clk);
+                release DUT.CIRCLE_FSM.state;
+            end
+        end
     endtask
 
     task wait_done_and_deassert();
@@ -185,7 +198,7 @@ module circle_test_seq (
 
     endtask
 
-    task randomize_inside_grid();
+    task randomize_inside_grid(bit early_clear = 0);
         /*
             Randomize such that centre is inside
 
@@ -207,7 +220,12 @@ module circle_test_seq (
         vif.radius = $urandom_range(20, 40);
         vif.start = 1'b1;
 
-        wait_done_and_deassert(); 
+
+
+        fork
+            if (early_clear) force_early_clear();
+            wait_done_and_deassert(); 
+        join
 
     endtask
 

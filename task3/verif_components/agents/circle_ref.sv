@@ -8,6 +8,7 @@ package circle_ref_pkg;
 
     // Internal ref state
     typedef enum {
+        IDLE,
         CLEAR,
         DRAW_CIRCLE,
         REF_DONE
@@ -39,16 +40,19 @@ module circle_ref (circle_if vif, phases phases);
 
             $display("[%0t ns][ref_model] Running circle reference model", $time);
             ref_main();
+            fork
+                if(vif.start == 1'b0) begin
+                    ref_state = IDLE;
+                end
+                else begin
+                    @(posedge vif.start == 1'b0);
+                    @(posedge vif.clk);
+                    ref_state = IDLE;
+                end
+            join_none
 
-            if (vif.start == 1'b1) begin
-                $display("[%0t ns][ref_model] Waiting start signal...", $time);
-                @(start_trig);
-            end
-
-            if (vif.start == 1'b0) begin : wait_start_trig
-                $display("[%0t ns][ref_model] Waiting start signal...", $time);
-                @(start_trig);
-            end
+            $display("[%0t ns][ref_model] Waiting start signal...", $time);
+            @(start_trig);
         end
     endtask
 
@@ -75,16 +79,26 @@ module circle_ref (circle_if vif, phases phases);
         ref_state = CLEAR;
         vif.ref_state = CIRCLE_BLACK;
         vif.vga_plot = 1'b1;
-        for (int x = 0; x <= 159; x++) begin
-            for (int y = 0; y <= 119; y++) begin
-                @(posedge vif.clk) begin
-                    vif.vga_x <= x;
-                    vif.vga_y <= y;
-                    vif.vga_colour <= 0;
+
+        fork
+            begin : clear_loop 
+                for (int x = 0; x <= 159; x++) begin
+                    for (int y = 0; y <= 119; y++) begin
+                        if (vif.forced_early_clear) begin
+                            disable clear_loop; // exit both loops
+                        end
+                        @(posedge vif.clk);
+                        vif.vga_x      <= x;
+                        vif.vga_y      <= y;
+                        vif.vga_colour <= 'b0;
+                    end
                 end
             end
-        end
 
+            if (vif.forced_early_clear == 1'b1)
+                #0;
+        join
+        
         @(posedge vif.clk); // Wait for fill_done to startup circle drawing
         vif.vga_x <= 'b0;
         vif.vga_y <= 'b0;
