@@ -105,7 +105,7 @@ module datapath #(
     end
 
     always_ff @( posedge clk ) begin : REG__crit_offset_y 
-        if (inc_y)  calc_offset_y <= calc_offset_y + 'b1;
+        if (inc_y)  calc_offset_y <= offset_y + 'b1;
         else        calc_offset_y <= offset_y;
     end
 
