@@ -37,16 +37,16 @@ module circle_ref (circle_if vif, phases phases);
 
         while(phases.run_phase == 1) begin
 
-            $display("[ref_model] Running circle reference model");
+            $display("[%0t ns][ref_model] Running circle reference model", $time);
             ref_main();
 
             if (vif.start == 1'b1) begin
-                $display("[ref_model] Waiting start signal...");
+                $display("[%0t ns][ref_model] Waiting start signal...", $time);
                 @(start_trig);
             end
 
             if (vif.start == 1'b0) begin : wait_start_trig
-                $display("[ref_model] Waiting start signal...");
+                $display("[%0t ns][ref_model] Waiting start signal...", $time);
                 @(start_trig);
             end
         end
@@ -71,7 +71,7 @@ module circle_ref (circle_if vif, phases phases);
         @(posedge vif.clk); // Fillscreen + 1 delay
 
         // Clear Screen
-        $display("[ref_model] Running clear screen");
+        $display("[%0t ns][ref_model] Running clear screen", $time);
         ref_state = CLEAR;
         vif.ref_state = CIRCLE_BLACK;
         vif.vga_plot = 1'b1;
@@ -80,7 +80,7 @@ module circle_ref (circle_if vif, phases phases);
                 @(posedge vif.clk) begin
                     vif.vga_x <= x;
                     vif.vga_y <= y;
-                    vif.vga_colour <= 0; // TODO: What is black?
+                    vif.vga_colour <= 0;
                 end
             end
         end
@@ -89,7 +89,7 @@ module circle_ref (circle_if vif, phases phases);
         vif.vga_x <= 'b0;
         vif.vga_y <= 'b0;
 
-        $display("[ref_model] Running Circle Drawing");
+        $display("[%0t ns][ref_model] Running Circle Drawing", $time);
         ref_state = DRAW_CIRCLE;
 
         while (offset_y <= offset_x) begin

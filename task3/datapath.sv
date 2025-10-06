@@ -27,8 +27,10 @@ module datapath #(
     input   logic unsigned                  dec_x,
     input   logic unsigned                  inc_y,
     input   logic unsigned                  calc_crit,
-    input   logic unsigned                  load_x,
-    input   logic unsigned                  load_y,
+    input   logic unsigned                  load_x_init,
+    input   logic unsigned                  load_y_init,
+    input   logic unsigned                  load_x_next,
+    input   logic unsigned                  load_y_next,
     input   logic unsigned                  load_crit,
     output  logic signed  [OFFSET_X_DW-1:0] offset_x,  
     output  logic signed  [OFFSET_Y_DW-1:0] offset_y,  
@@ -70,6 +72,9 @@ module datapath #(
     logic signed [OCT_DW-1:0] oct8_y;
     logic signed [OCT_DW-1:0] circle_int_y;
 
+    logic signed  [OFFSET_X_DW-1:0] calc_offset_x;  
+    logic signed  [OFFSET_Y_DW-1:0] calc_offset_y;  
+
     // ---------------- TOP LEVEL MUX ----------------
     assign vga_x = (draw_circle) ? circle_x   : clear_x;
     assign vga_y = (draw_circle) ? circle_y   : clear_y;
@@ -78,23 +83,38 @@ module datapath #(
     // ---------------- OFFSET/CRIT REGISTERS ----------------
 
     always_ff @( posedge clk ) begin : REG__offset_x 
-        if(!resetn)      offset_x <= 'b0;
-        else if (load_x) offset_x <= radius;
-        else if (dec_x)  offset_x <= offset_x - 'b1;
+        if(!resetn)           offset_x <= 'b0;
+        else if (load_x_init) offset_x <= radius;
+        else if (load_x_next) offset_x <= calc_offset_x;
     end
 
     always_ff @( posedge clk ) begin : REG__offset_y 
-        if(!resetn)      offset_y <= 'b0;
-        else if (load_x) offset_y <= 'b0;
-        else if (inc_y)  offset_y <= offset_y + 'b1;
+        if(!resetn)           offset_y <= 'b0;
+        else if (load_y_init) offset_y <= 'b0;
+        else if (load_y_next) offset_y <= calc_offset_y;
+    end
+
+    // TODO: KARSTEN - I think that it should be calc_offset_x going into 
+    //                 the FSM so that it has the incremented/decrement value when decideding
+    //                 to go to the DONE state or OCT1 again but its not passing
+    //                 when I do this????? idk why will look into this later
+
+    always_ff @( posedge clk ) begin : REG__crit_offset_x 
+        if (dec_x) calc_offset_x <= offset_x - 'b1;
+        else       calc_offset_x <= offset_x;
+    end
+
+    always_ff @( posedge clk ) begin : REG__crit_offset_y 
+        if (inc_y)  calc_offset_y <= calc_offset_y + 'b1;
+        else        calc_offset_y <= offset_y;
     end
 
     always_ff @( posedge clk ) begin : REG__crit
         if(!resetn)         crit  <= 'b0;
         else if (load_crit) crit  <= 'b1 - radius;
         else if (calc_crit)  begin
-            if (crit <= 'sb0) crit <= crit + 'sd2 * (offset_y+'sb1) + 'sb1;
-            else              crit <= crit + 'sd2 * (offset_y+'sb1 - (offset_x-'sb1)) + 'sb1;
+            if (crit <= 'sb0) crit <= crit + 'sd2 * (calc_offset_y) + 'sb1;
+            else              crit <= crit + 'sd2 * (calc_offset_y - calc_offset_x) + 'sb1;
         end
     end
 

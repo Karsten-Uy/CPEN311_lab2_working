@@ -37,15 +37,12 @@ module circle_test_seq (
         // randomize_corner();
         // randomize_edge();
 
-
-        randomize_inside_grid();
-        randomize_inside_grid();
         // randomize_inside_grid();
 
-        // repeat(10) begin
-        //     randomize_inside_grid();
-            
-        // end
+        repeat(10) begin
+            randomize_inside_grid(); 
+        end
+
     endtask
 
     task force_early_clear();
@@ -58,7 +55,8 @@ module circle_test_seq (
         vif.start = 1'b0;
 
         // Wait some random time before next start
-        repeat($urandom_range(0,20)) @(posedge vif.clk);
+        repeat($urandom_range(10,20)) @(posedge vif.clk);
+
     endtask
 
 
@@ -201,12 +199,14 @@ module circle_test_seq (
         */
 
         vif.centre_x = $urandom_range(60, 120); 
-        vif.centre_y = $urandom_range(40, 60); 
+        vif.centre_y = $urandom_range(40, 60);
+        vif.colour   = $urandom_range(1, 7);
 
         // Has potential to be partially outiside
         // TODO: Make tigher constraints to test fully inside and partially outside
         vif.radius = $urandom_range(20, 40);
         vif.start = 1'b1;
+
         wait_done_and_deassert(); 
 
     endtask

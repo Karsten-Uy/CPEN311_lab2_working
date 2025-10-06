@@ -1,22 +1,10 @@
 
-module circle_fsm #(
-    parameter VGA_X_DW  = 7, 
-    parameter VGA_Y_DW  = 6, 
-    parameter RADIUS_DW = 7,
-    parameter CRIT_DW   = RADIUS_DW+1, // unsigned so +1 in size
-
-    // Set offsets and octant such that they're X widths + 1
-    parameter OFFSET_X_DW = VGA_X_DW + 1,
-    parameter OFFSET_Y_DW = VGA_Y_DW + 1
-)(
+module circle_fsm(
 
     // From circle
     input logic clk, 
     input logic rst_n, 
     input logic [2:0] colour,
-    // input logic [7:0] centre_x, 
-    // input logic [6:0] centre_y,
-    // input logic [8:0] radius,
     input logic start,
 
     // From Datapath
@@ -33,8 +21,10 @@ module circle_fsm #(
     output logic draw_circle,
     output logic [2:0] octant_sel,
     output logic fill_start,
-    output logic x_load,
-    output logic y_load,
+    output logic load_x_init,
+    output logic load_y_init,
+    output logic load_x_next,
+    output logic load_y_next,
     output logic crit_load,
     output logic inc_y,
     output logic dec_x,
@@ -79,8 +69,10 @@ module circle_fsm #(
         draw_circle = 1'd0;
         octant_sel  = 3'd0;
         fill_start  = 1'd0;
-        x_load      = 1'd0;
-        y_load      = 1'd0;
+        load_x_init = 1'd0;
+        load_y_init = 1'd0;
+        load_x_next = 1'd0;
+        load_y_next = 1'd0;
         crit_load   = 1'd0;
         inc_y       = 1'd0;
         dec_x       = 1'd0;
@@ -88,8 +80,8 @@ module circle_fsm #(
 
         case(state)
             CIRCLE_LOAD  : begin 
-                x_load = 1'd1;
-                y_load = 1'd1;
+                load_x_init = 1'd1;
+                load_y_init = 1'd1;
                 crit_load = 1'd1;
             end
             CIRCLE_BLACK : begin 
@@ -131,15 +123,17 @@ module circle_fsm #(
                 draw_circle = 1'd1;
                 vga_colour = colour;
                 octant_sel = 3'd6;
+                inc_y = 1'd1;
+                if (curr_crit > 0)
+                    dec_x = 1'd1;
             end
             CIRCLE_OCT8  : begin 
                 draw_circle = 1'd1;
                 vga_colour = colour;
                 octant_sel = 3'd7;
-                inc_y = 1'd1;
-                if (curr_crit > 0)
-                    dec_x = 1'd1;
                 calc_crit = 1'd1;
+                load_x_next = 1'd1;
+                load_y_next = 1'd1;
             end
             CIRCLE_DONE  : done = 1'd1;
             default      : begin
@@ -148,8 +142,10 @@ module circle_fsm #(
                 draw_circle = 1'd0;
                 octant_sel  = 3'd0;
                 fill_start  = 1'd0;
-                x_load      = 1'd0;
-                y_load      = 1'd0;
+                load_x_init = 1'd0;
+                load_y_init = 1'd0;
+                load_x_next = 1'd0;
+                load_y_next = 1'd0;
                 crit_load   = 1'd0;
                 inc_y       = 1'd0;
                 dec_x       = 1'd0;
