@@ -1,4 +1,7 @@
-module tb_rtl_task3();
+
+// `define VISUAL // NOTE: need to uncomment this in circle_test_seq.sv for this to work
+
+module tb_rtl_task3_visual();
 
     // Your testbench goes here. Our toplevel will give up after 1,000,000 ticks.
 
@@ -9,15 +12,16 @@ module tb_rtl_task3();
     phases     phases();
 
     // Interfaces
-    top_if dut_if();
+    top_visual_if dut_if();
     circle_if circ_dut_if();
     circle_monitor circle_monitor(.vif(circ_dut_if), .phases(phases));
 
     // Main DUT stimulus
-    top_test_seq test_seq (.vif(dut_if), .phases(phases));
+    circle_test_seq test_seq (.vif(circ_dut_if), .phases(phases));
 
     // --------------------  DUT INSTANTIATION --------------------
-    task3 DUT (
+
+    task3_visual DUT (
         .CLOCK_50   (dut_if.CLOCK_50),
         .KEY        (dut_if.KEY),
         .SW         (dut_if.SW),
@@ -37,20 +41,23 @@ module tb_rtl_task3();
         .VGA_X      (dut_if.VGA_X),
         .VGA_Y      (dut_if.VGA_Y),
         .VGA_COLOUR (dut_if.VGA_COLOUR),
-        .VGA_PLOT   (dut_if.VGA_PLOT)
+        .VGA_PLOT   (dut_if.VGA_PLOT),
+        .centre_x   (dut_if.centre_x),
+        .centre_y   (dut_if.centre_y),
+        .radius     (dut_if.radius)
     );
 
-    assign circ_dut_if.clk         = dut_if.CLOCK_50;
-    assign circ_dut_if.rst_n       = dut_if.KEY[3];
-    assign circ_dut_if.start       = dut_if.KEY[0];
+    assign dut_if.CLOCK_50  = circ_dut_if.clk;
+    assign dut_if.KEY[3]    = circ_dut_if.rst_n;
+    assign dut_if.KEY[0]    = circ_dut_if.start;
 
     /*
      * NOTE: the inputs into the circle module are hardcoded so 
      *       they are hardcoded when passed into the ref model
      */
-    assign circ_dut_if.radius   = 8'd40;
-    assign circ_dut_if.centre_x = 8'd80;
-    assign circ_dut_if.centre_y = 8'd60;
+    assign dut_if.centre_x   = circ_dut_if.radius;   
+    assign dut_if.centre_y   = circ_dut_if.centre_x;   
+    assign dut_if.radius     = circ_dut_if.centre_y;   
 
     assign circ_dut_if.done        = dut_if.LEDR[0];
     assign circ_dut_if.vga_x       = dut_if.VGA_X;
@@ -60,8 +67,6 @@ module tb_rtl_task3();
 
     // -------------------- RUNNING TEST AND COLLECT COVERAGE --------------------
     int ERROR_COUNT = 0;
-
-
 
     initial begin
         // Treat as run_phase()
@@ -110,4 +115,4 @@ module tb_rtl_task3();
         end
     end
 
-endmodule: tb_rtl_task3
+endmodule: tb_rtl_task3_visual

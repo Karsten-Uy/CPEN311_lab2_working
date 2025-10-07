@@ -1,11 +1,24 @@
-module task3(input logic CLOCK_50, input logic [3:0] KEY,
+
+/* 
+ * NOTE: This module is NOT synthesizable but meant to be used with 
+ * the tb_rtl_task3_visual testbench to see what is being tested on
+ * the fake VGA screen
+ */
+
+module task3_visual(input logic CLOCK_50, input logic [3:0] KEY,
              input logic [9:0] SW, output logic [9:0] LEDR,
              output logic [6:0] HEX0, output logic [6:0] HEX1, output logic [6:0] HEX2,
              output logic [6:0] HEX3, output logic [6:0] HEX4, output logic [6:0] HEX5,
              output logic [7:0] VGA_R, output logic [7:0] VGA_G, output logic [7:0] VGA_B,
              output logic VGA_HS, output logic VGA_VS, output logic VGA_CLK,
              output logic [7:0] VGA_X, output logic [6:0] VGA_Y,
-             output logic [2:0] VGA_COLOUR, output logic VGA_PLOT);
+             output logic [2:0] VGA_COLOUR, output logic VGA_PLOT,
+             
+             // Temp arguments for visualizatiob
+             input logic [7:0] centre_x, 
+             input logic [6:0] centre_y, 
+             input logic [7:0] radius
+             );
 
     // instantiate and connect the VGA adapter and your module
 
@@ -27,9 +40,9 @@ module task3(input logic CLOCK_50, input logic [3:0] KEY,
         .clk        (CLOCK_50),
         .rst_n      (KEY[3]),
         .colour     (3'd2),
-        .centre_x   (8'd80),
-        .centre_y   (7'd60),
-        .radius     (8'd40),
+        .centre_x   (centre_x),
+        .centre_y   (centre_y),
+        .radius     (radius),
         .start      (KEY[0]),
         .done       (LEDR[0]),
         .vga_x      (vga_x),
@@ -58,4 +71,4 @@ module task3(input logic CLOCK_50, input logic [3:0] KEY,
         .*);
 
 
-endmodule: task3
+endmodule: task3_visual

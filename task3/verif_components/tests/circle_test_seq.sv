@@ -1,5 +1,7 @@
 `timescale 1ns/1ns
 
+// `define VISUAL // for seeing output on fake VGA with tb_rtl_task3_visual.sv
+
 module circle_test_seq (
     circle_if vif,
     phases phases
@@ -52,13 +54,26 @@ module circle_test_seq (
     task force_early_clear();
         vif.forced_early_clear = 1'b1;
         // Use to force DUT state to skip CLEAR_SCREEN state once it's been verified
+        `ifdef VISUAL        
+        if (DUT.CIRCLE.CIRCLE_FSM.state != CIRCLE_BLACK) begin
+            @(DUT.CIRCLE.CIRCLE_FSM.state == CIRCLE_BLACK) begin
+        `else
         if (DUT.CIRCLE_FSM.state != CIRCLE_BLACK) begin
             @(DUT.CIRCLE_FSM.state == CIRCLE_BLACK) begin
+        `endif
                 @(posedge vif.clk);
                 @(posedge vif.clk);
-                force DUT.CIRCLE_FSM.state = CIRCLE_OCT1;
+                `ifdef VISUAL        
+                    force DUT.CIRCLE.CIRCLE_FSM.state = CIRCLE_OCT1;
+                `else
+                    force DUT.CIRCLE_FSM.state = CIRCLE_OCT1;
+                `endif
                 @(posedge vif.clk);
-                release DUT.CIRCLE_FSM.state;
+                `ifdef VISUAL        
+                    release DUT.CIRCLE.CIRCLE_FSM.state;
+                `else
+                    release DUT.CIRCLE_FSM.state;
+                `endif
             end
         end
     endtask
