@@ -21,5 +21,4 @@ interface top_if;
     logic [2:0] VGA_COLOUR; 
     logic VGA_PLOT;
 
-
 endinterface

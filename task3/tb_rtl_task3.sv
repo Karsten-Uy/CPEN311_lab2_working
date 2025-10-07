@@ -55,18 +55,18 @@ module tb_rtl_task3();
         .VGA_PLOT   (dut_if.VGA_PLOT)
     );
 
-    // assign dut_if.CLOCK_50   = circ_dut_if.clk;
-    // assign dut_if.KEY[3]     = circ_dut_if.rst_n;
-    // assign dut_if.KEY[0]     = circ_dut_if.start;
-    // assign dut_if.LEDR[0]    = circ_dut_if.done;
-    // assign dut_if.VGA_X      = circ_dut_if.vga_x;
-    // assign dut_if.VGA_Y      = circ_dut_if.vga_y;
-    // assign dut_if.VGA_COLOUR = circ_dut_if.vga_colour;
-    // assign dut_if.VGA_PLOT   = circ_dut_if.vga_plot;
-
     assign circ_dut_if.clk         = dut_if.CLOCK_50;
     assign circ_dut_if.rst_n       = dut_if.KEY[3];
     assign circ_dut_if.start       = dut_if.KEY[0];
+
+    /*
+     * NOTE: the inputs into the circle module are hardcoded so 
+     *       they are hardcoded when passed into the ref model
+     */
+    assign circ_dut_if.radius   = 8'd40;
+    assign circ_dut_if.centre_x = 8'd80;
+    assign circ_dut_if.centre_y = 8'd60;
+
     assign circ_dut_if.done        = dut_if.LEDR[0];
     assign circ_dut_if.vga_x       = dut_if.VGA_X;
     assign circ_dut_if.vga_y       = dut_if.VGA_Y;

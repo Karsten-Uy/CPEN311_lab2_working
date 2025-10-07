@@ -4,8 +4,7 @@ module top_test_seq (
     top_if vif,
     phases phases
 );
-
-    // import lab_pkg::*;
+    import lab_pkg::*;
 
     // --------------------  DUT SPECIFIC VERIF COMPONENTS --------------------
     rst_clk_if     CLOCK_50_if();
@@ -35,35 +34,32 @@ module top_test_seq (
 
     task run();
 
-        test_default(); 
+        /*
+         * NOTE: the inputs into the circle module are hardcoded so 
+         *       we cannot add much external stimuli beyond resets
+         */
+
+        vif.KEY[0] = 1'b1;        
+        wait_done_and_deassert(); 
+        
+        // Ensure resets work
+        repeat(2) begin
+            vif.KEY[0] = 1'b1;  
+            repeat($urandom_range(0,20_000)) @(posedge vif.CLOCK_50);
+            vif.KEY[0] = 1'b0;
+            CLOCK_50_driver.rst_start(.active_low(1));
+        end
 
     endtask
-
-    // task wait_done_and_deassert();
-    //     @(vif.LEDR[0]);
-
-    //     repeat($urandom_range(0,20)) @(posedge vif.CLOCK_50);
-    //     vif.KEY[0] = 1'b0;
-
-    //     // Wait some random time before next start
-    //     repeat($urandom_range(10,20)) @(posedge vif.CLOCK_50);
-    // endtask
-
-    task test_default();
     
-        vif.KEY[0] = 1'b1;
-        // wait_done_and_deassert(); 
-
+    task wait_done_and_deassert();
         @(vif.LEDR[0]);
-
         repeat($urandom_range(0,20)) @(posedge vif.CLOCK_50);
         vif.KEY[0] = 1'b0;
 
         // Wait some random time before next start
         repeat($urandom_range(10,20)) @(posedge vif.CLOCK_50);
 
-
     endtask
-
 
 endmodule // top_test_seq
