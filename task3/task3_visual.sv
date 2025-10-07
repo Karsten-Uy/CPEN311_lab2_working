@@ -17,7 +17,8 @@ module task3_visual(input logic CLOCK_50, input logic [3:0] KEY,
              // Temp arguments for visualizatiob
              input logic [7:0] centre_x, 
              input logic [6:0] centre_y, 
-             input logic [7:0] radius
+             input logic [7:0] radius,
+             input logic [2:0] colour
              );
 
     // instantiate and connect the VGA adapter and your module
@@ -39,7 +40,7 @@ module task3_visual(input logic CLOCK_50, input logic [3:0] KEY,
     circle CIRCLE(
         .clk        (CLOCK_50),
         .rst_n      (KEY[3]),
-        .colour     (3'd2),
+        .colour     (colour),
         .centre_x   (centre_x),
         .centre_y   (centre_y),
         .radius     (radius),

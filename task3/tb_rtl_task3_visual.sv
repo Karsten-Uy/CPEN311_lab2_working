@@ -44,7 +44,8 @@ module tb_rtl_task3_visual();
         .VGA_PLOT   (dut_if.VGA_PLOT),
         .centre_x   (dut_if.centre_x),
         .centre_y   (dut_if.centre_y),
-        .radius     (dut_if.radius)
+        .radius     (dut_if.radius),
+        .colour     (dut_if.colour)
     );
 
     assign dut_if.CLOCK_50  = circ_dut_if.clk;
@@ -58,6 +59,7 @@ module tb_rtl_task3_visual();
     assign dut_if.centre_x   = circ_dut_if.radius;   
     assign dut_if.centre_y   = circ_dut_if.centre_x;   
     assign dut_if.radius     = circ_dut_if.centre_y;   
+    assign dut_if.colour     = circ_dut_if.colour;   
 
     assign circ_dut_if.done        = dut_if.LEDR[0];
     assign circ_dut_if.vga_x       = dut_if.VGA_X;

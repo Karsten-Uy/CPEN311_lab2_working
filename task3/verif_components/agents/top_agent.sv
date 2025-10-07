@@ -50,5 +50,6 @@ interface top_visual_if;
     logic [7:0] centre_x;
     logic [6:0] centre_y;
     logic [7:0] radius;
+    logic [2:0] colour;
 
 endinterface
