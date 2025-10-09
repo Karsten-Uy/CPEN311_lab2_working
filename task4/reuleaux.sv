@@ -4,5 +4,17 @@ module reuleaux(input logic clk, input logic rst_n, input logic [2:0] colour,
                 output logic [7:0] vga_x, output logic [6:0] vga_y,
                 output logic [2:0] vga_colour, output logic vga_plot);
      // draw the Reuleaux triangle
+
+     /*
+
+          IDEA:
+
+               - have 3 circle drawers
+                    - enable plot only when in valid space
+
+
+      */
+     
+
 endmodule
 

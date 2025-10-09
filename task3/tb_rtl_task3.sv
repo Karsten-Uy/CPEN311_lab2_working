@@ -1,7 +1,5 @@
 module tb_rtl_task3();
 
-    // Your testbench goes here. Our toplevel will give up after 1,000,000 ticks.
-
     import lab_pkg::*;
 
     // --------------------  VERIFICATION COMPONENTS --------------------

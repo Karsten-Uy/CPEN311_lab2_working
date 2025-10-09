@@ -32,7 +32,7 @@ module circle(input logic clk, input logic rst_n, input logic [2:0] colour,
 
      datapath DP(
           .clk         (clk),
-          .resetn      (resetn),
+          .resetn      (rst_n),
           .radius      (radius_sgn),
           .centre_x    (centre_x_sgn),
           .centre_y    (centre_y_sgn),
