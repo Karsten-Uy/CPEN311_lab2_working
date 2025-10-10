@@ -99,6 +99,7 @@ module triangle_ref (triangle_if vif, phases phases);
         vif.vga_x <=  'b0;
         vif.vga_y <=  'b0;
         ref_state = triangle_ref_pkg::REF_DONE;
+        $display("Draw triangle done");
 
     endtask
 
@@ -183,8 +184,10 @@ module triangle_ref (triangle_if vif, phases phases);
             if (inside_y(y)) vif.vga_y = y;
             else             vif.vga_y = 'b0;
 
-            if (inside_x(x) && inside_y(x)) vif.vga_plot = 1'b1;
+            if (inside_x(x) && inside_y(y)) vif.vga_plot = 1'b1;
             else vif.vga_plot = 1'b0;
+
+            $display("%d,%d", vif.vga_x, vif.vga_y);
         end
         else begin
             vif.vga_x    =  'b0;
