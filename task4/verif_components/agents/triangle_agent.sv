@@ -122,7 +122,7 @@ module triangle_monitor (
             @ (negedge vif.clk); // Synchonization event
             Mismatch = 0;
 
-            if((ref_model.ref_state == triangle_ref_pkg::DRAW_TRIANGLE) && (ref_model.ref_state != lab_pkg::BLACK)) begin
+            if((ref_model.ref_state == triangle_ref_pkg::DRAW_TRIANGLE) && (ref_model.ref_state != lab_pkg::REUL_BLACK)) begin
                 // Checks that x, y and color match with reference model
                 if (vif.vga_x != ref_if.vga_x ) begin
                     Mismatch = 1;

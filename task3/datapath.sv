@@ -83,7 +83,7 @@ module datapath #(
     // ---------------- OFFSET/CRIT REGISTERS ----------------
 
     always_ff @( posedge clk ) begin : REG__offset_x 
-        if(!resetn)           offset_x <= 'sb0;
+        if(!resetn)           offset_x <= 'sd0;
         else if (load_x_init) offset_x <= radius;
         else if (load_x_next) offset_x <= calc_offset_x;
     end
@@ -94,18 +94,13 @@ module datapath #(
         else if (load_y_next) offset_y <= calc_offset_y;
     end
 
-    // TODO: KARSTEN - I think that it should be calc_offset_x going into 
-    //                 the FSM so that it has the incremented/decrement value when decideding
-    //                 to go to the DONE state or OCT1 again but its not passing
-    //                 when I do this????? idk why will look into this later
-
     always_ff @( posedge clk ) begin : REG__crit_offset_x 
         if (dec_x) calc_offset_x <= offset_x - 'sb1;
         else       calc_offset_x <= offset_x;
     end
 
     always_ff @( posedge clk ) begin : REG__crit_offset_y 
-        if (inc_y)  calc_offset_y <= offset_y + 'b1;
+        if (inc_y)  calc_offset_y <= offset_y + 'sb1;
         else        calc_offset_y <= offset_y;
     end
 
