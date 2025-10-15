@@ -31,9 +31,13 @@ module triangle_test_seq (
     task run();
         vif.forced_early_clear = 1'b0;
 
+        vif.colour = 3'b101;
+
         // Test that multiple iterations operate properly
         random_centre();
         // random_centre();
+
+        
 
         // Randomize centres many times to catch errors
         // repeat(50) begin

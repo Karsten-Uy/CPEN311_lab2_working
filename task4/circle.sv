@@ -14,9 +14,6 @@ module circle#(
 );
 
      // FSM Signals
-     logic unsigned       fill_start;
-     logic unsigned       fill_done;
-     logic unsigned       draw_circle;
      logic unsigned [2:0] octant_sel;
      logic unsigned       dec_x;
      logic unsigned       inc_y;

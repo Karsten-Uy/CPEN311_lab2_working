@@ -29,8 +29,6 @@ module reuleaux(input logic clk, input logic rst_n, input logic [2:0] colour,
     logic fillscreen_plot;
 
     // Screencheck
-    logic unsigned [7:0] reul_vga_x;
-    logic unsigned [6:0] reul_vga_y;
     logic reul_vga_plot;
 
     // CALC_CORNERS
@@ -70,10 +68,6 @@ module reuleaux(input logic clk, input logic rst_n, input logic [2:0] colour,
     logic unsigned [7:0] circle_vga_x;
     logic unsigned [6:0] circle_vga_y;
     logic unsigned       circle_vga_plot;
-
-    // Final Screencheck
-    logic unsigned       reul_plot;
-
     
     // ---------------- MAIN FSM INST ----------------
     reuleaux_fsm REULEAUX_FSM (
@@ -98,7 +92,7 @@ module reuleaux(input logic clk, input logic rst_n, input logic [2:0] colour,
     // ---------------- FILL_SCREEN INST ----------------
     fillscreen U_FILLSCREEN (
         .clk           (clk),
-        .rst_n         (resetn),
+        .rst_n         (rst_n),
         .start         (fill_start),
         .done          (fill_done),
         .vga_x         (clear_x),
@@ -171,6 +165,7 @@ module reuleaux(input logic clk, input logic rst_n, input logic [2:0] colour,
         .centre_y (c_y1),
         .radius   (s_diameter),
         .start    (start1),
+
         .done     (fsm1_done),
         .vga_x    (circ1_vga_x),
         .vga_y    (circ1_vga_y),
@@ -184,6 +179,7 @@ module reuleaux(input logic clk, input logic rst_n, input logic [2:0] colour,
         .centre_y (c_y2),
         .radius   (s_diameter),
         .start    (start2),
+
         .done     (fsm2_done),
         .vga_x    (circ2_vga_x),
         .vga_y    (circ2_vga_y),
@@ -197,6 +193,7 @@ module reuleaux(input logic clk, input logic rst_n, input logic [2:0] colour,
         .centre_y (c_y3),
         .radius   (s_diameter),
         .start    (start3),
+
         .done     (fsm3_done),
         .vga_x    (circ3_vga_x),
         .vga_y    (circ3_vga_y),
@@ -232,10 +229,11 @@ module reuleaux(input logic clk, input logic rst_n, input logic [2:0] colour,
     
     always_comb begin : FINAL_SCREENCHECK
         case({start1,start2,start3})
-            3'b100 : reul_plot = (circle_vga_x <= c_x3) ? 1'b1 : 1'b0;
-            3'b010 : reul_plot = (circle_vga_x >= c_x3) ? 1'b1 : 1'b0;
-            3'b001 : reul_plot = (circle_vga_x <= c_x1 && circle_vga_x >= c_x2) ? 1'b1 : 1'b0;
-            default : reul_plot = 1'b0;
+            // 3'b100  : reul_vga_plot = (circle_vga_x <= c_x3) ? 1'b1 : 1'b0;
+            // 3'b010  : reul_vga_plot = (circle_vga_x >= c_x3) ? 1'b1 : 1'b0;
+            // 3'b001  : reul_vga_plot = (circle_vga_x <= c_x1 && circle_vga_x >= c_x2) ? 1'b1 : 1'b0;
+            // default : reul_vga_plot = 1'b0;
+            default : reul_vga_plot = 1'b1;
         endcase
     end
 

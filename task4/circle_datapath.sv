@@ -20,9 +20,6 @@ module datapath #(
     input   logic signed [7:0]    centre_y,
 
     // FSM signals
-    input   logic unsigned                  fill_start,
-    output  logic unsigned                  fill_done,
-    input   logic unsigned                  draw_circle,
     input   logic unsigned [2:0]            octant_sel, // binary select mux for 0-7
     input   logic unsigned                  dec_x,
     input   logic unsigned                  inc_y,
@@ -43,6 +40,7 @@ module datapath #(
 );
 
     // ---------------- INTERNAL SIGNALS ----------------
+    // logic signed   [CRIT_DW-1:0] next_crit;
 
     logic unsigned [VGA_X_DW-1:0] circle_x; 
     logic unsigned [VGA_Y_DW-1:0] circle_y;
@@ -75,9 +73,13 @@ module datapath #(
     logic signed  [OFFSET_Y_DW-1:0] calc_offset_y;  
 
     // ---------------- TOP LEVEL MUX ----------------
-    assign vga_x = (draw_circle) ? circle_x   : clear_x;
-    assign vga_y = (draw_circle) ? circle_y   : clear_y;
-    assign plot  = (draw_circle) ? circle_plot: fillscreen_plot;
+    // assign vga_x = (draw_circle) ? circle_x   : clear_x;
+    // assign vga_y = (draw_circle) ? circle_y   : clear_y;
+    // assign plot  = (draw_circle) ? circle_plot: fillscreen_plot;
+
+    assign vga_x =  circle_x;
+    assign vga_y =  circle_y;
+    assign plot  =  circle_plot;
 
     // ---------------- OFFSET/CRIT REGISTERS ----------------
 
@@ -164,15 +166,15 @@ module datapath #(
                        circle_int_y <= 'sd119 && circle_int_y >= 'sd0) ? 1'b1 : 1'b0;
     end
 
-    // ---------------- FILL_SCREEN INST ----------------
-    fillscreen u_fillscreen (
-        .clk           (clk),
-        .rst_n         (resetn),
-        .start         (fill_start),
-        .done          (fill_done),
-        .vga_x         (clear_x),
-        .vga_y         (clear_y),
-        .vga_plot      (fillscreen_plot)
-    );
+    // // ---------------- FILL_SCREEN INST ----------------
+    // fillscreen u_fillscreen (
+    //     .clk           (clk),
+    //     .rst_n         (resetn),
+    //     .start         (fill_start),
+    //     .done          (fill_done),
+    //     .vga_x         (clear_x),
+    //     .vga_y         (clear_y),
+    //     .vga_plot      (fillscreen_plot)
+    // );
 
 endmodule

@@ -43,7 +43,8 @@ module reuleaux_fsm(
 
     always_comb begin : NEXT_STATE_LOGIC
         case(state)
-            REUL_IDLE  : next = (start == 1'd1)     ? REUL_BLACK : REUL_IDLE;
+            // REUL_IDLE  : next = (start == 1'd1)     ? REUL_BLACK : REUL_IDLE;
+            REUL_IDLE  : next = (start == 1'd1)     ? REUL_FSM1 : REUL_IDLE;
             REUL_BLACK : next = (fill_done == 1'b1) ? REUL_FSM1  : REUL_BLACK;
             REUL_FSM1  : next = (fsm1_done == 1'b1) ? REUL_FSM2  : REUL_FSM1;
             REUL_FSM2  : next = (fsm2_done == 1'b1) ? REUL_FSM3  : REUL_FSM2;
