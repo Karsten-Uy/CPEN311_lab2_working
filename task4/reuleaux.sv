@@ -114,10 +114,10 @@ module reuleaux(input logic clk, input logic rst_n, input logic [2:0] colour,
         s_diameter = {1'sb0, diameter};        
 
         // Circle 1 corner calculation
-        c_x1 = c_x + (s_diameter >> 2);
+        c_x1 = c_x + (s_diameter >> 1);
         tmp_shifted1 = diameter * SQRT_3_DIV_6;
         c_y1 = c_y + (tmp_shifted1 >> M_BIT_SHIFT);
-        c_x2 = c_x - (s_diameter >> 2);
+        c_x2 = c_x - (s_diameter >> 1);
         tmp_shifted2 = diameter * SQRT_3_DIV_6;
         c_y2 = c_y + (tmp_shifted2 >> M_BIT_SHIFT);
         c_x3 = c_x;
@@ -150,19 +150,15 @@ module reuleaux(input logic clk, input logic rst_n, input logic [2:0] colour,
         end
     end
 
-    // TODO: circle block + MUX, screencheck
-
-    // CIRCLE BLOCKS
-    // 1 datapath + 3 FSMs
-
     // ---------------- Circle Blocks ----------------
 
+    // TODO: fix weird dot in the middle bug
 
     circle #(1) CIRC_1 (
         .clk      (clk),
         .rst_n    (rst_n),
-        .centre_x (c_x1),
-        .centre_y (c_y1),
+        .centre_x (c_x1_reg),
+        .centre_y (c_y1_reg),
         .radius   (s_diameter),
         .start    (start1),
 
@@ -175,8 +171,8 @@ module reuleaux(input logic clk, input logic rst_n, input logic [2:0] colour,
     circle #(2) CIRC_2 (
         .clk      (clk),
         .rst_n    (rst_n),
-        .centre_x (c_x2),
-        .centre_y (c_y2),
+        .centre_x (c_x2_reg),
+        .centre_y (c_y2_reg),
         .radius   (s_diameter),
         .start    (start2),
 
@@ -185,12 +181,12 @@ module reuleaux(input logic clk, input logic rst_n, input logic [2:0] colour,
         .vga_y    (circ2_vga_y),
         .vga_plot (circ2_vga_plot)    
     );
-
+ 
     circle #(3) CIRC_3 (
         .clk      (clk),
         .rst_n    (rst_n),
-        .centre_x (c_x3),
-        .centre_y (c_y3),
+        .centre_x (c_x3_reg),
+        .centre_y (c_y3_reg),
         .radius   (s_diameter),
         .start    (start3),
 
@@ -229,11 +225,11 @@ module reuleaux(input logic clk, input logic rst_n, input logic [2:0] colour,
     
     always_comb begin : FINAL_SCREENCHECK
         case({start1,start2,start3})
-            // 3'b100  : reul_vga_plot = (circle_vga_x <= c_x3) ? 1'b1 : 1'b0;
-            // 3'b010  : reul_vga_plot = (circle_vga_x >= c_x3) ? 1'b1 : 1'b0;
-            // 3'b001  : reul_vga_plot = (circle_vga_x <= c_x1 && circle_vga_x >= c_x2) ? 1'b1 : 1'b0;
-            // default : reul_vga_plot = 1'b0;
-            default : reul_vga_plot = 1'b1;
+            3'b100  : reul_vga_plot = (circle_vga_x <= c_x3) ? 1'b1 : 1'b0;
+            3'b010  : reul_vga_plot = (circle_vga_x >= c_x3) ? 1'b1 : 1'b0;
+            3'b001  : reul_vga_plot = (circle_vga_x <= c_x1 && circle_vga_x >= c_x2) ? 1'b1 : 1'b0;
+            default : reul_vga_plot = 1'b0;
+            // default : reul_vga_plot = 1'b1;
         endcase
     end
 

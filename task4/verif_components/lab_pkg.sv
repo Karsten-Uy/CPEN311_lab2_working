@@ -17,9 +17,9 @@ package lab_pkg;
     parameter M_BIT_SHIFT = 8;
 
     // floor(sqrt(3)/6*2^8)
-    parameter logic signed [8:0] SQRT_3_DIV_6 = 9'sd73;
+    parameter logic signed [8:0] SQRT_3_DIV_6 = 9'sd74;
     // floor(sqrt(3)/3*2^8)
-    parameter logic signed [8:0] SQRT_3_DIV_3 = 9'sd147;
+    parameter logic signed [8:0] SQRT_3_DIV_3 = 9'sd148;
     
     ///////////////////////////////////////////////////////////
     // circle assets
