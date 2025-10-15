@@ -56,6 +56,24 @@ module reuleaux(input logic clk, input logic rst_n, input logic [2:0] colour,
     logic signed [7:0] c_y2_reg;
     logic signed [8:0] c_x3_reg;
     logic signed [7:0] c_y3_reg;
+
+    // FSM Wires
+    logic unsigned [7:0] circ1_vga_x;
+    logic unsigned [6:0] circ1_vga_y;
+    logic unsigned       circ1_vga_plot;
+    logic unsigned [7:0] circ2_vga_x;
+    logic unsigned [6:0] circ2_vga_y;
+    logic unsigned       circ2_vga_plot;
+    logic unsigned [7:0] circ3_vga_x;
+    logic unsigned [6:0] circ3_vga_y;
+    logic unsigned       circ3_vga_plot;
+    logic unsigned [7:0] circle_vga_x;
+    logic unsigned [6:0] circle_vga_y;
+    logic unsigned       circle_vga_plot;
+
+    // Final Screencheck
+    logic unsigned       reul_plot;
+
     
     // ---------------- MAIN FSM INST ----------------
     reuleaux_fsm REULEAUX_FSM (
@@ -89,10 +107,11 @@ module reuleaux(input logic clk, input logic rst_n, input logic [2:0] colour,
     );
 
     // Fillscreen-Reualueaux Triangle Mux
-    assign vga_x    = (draw_reul == 1'b1) ? reul_vga_x    : clear_x;
-    assign vga_y    = (draw_reul == 1'b1) ? reul_vga_y    : clear_y;
+    assign vga_x    = (draw_reul == 1'b1) ? circle_vga_x  : clear_x;
+    assign vga_y    = (draw_reul == 1'b1) ? circle_vga_y  : clear_y;
     assign vga_plot = (draw_reul == 1'b1) ? reul_vga_plot : fillscreen_plot;
 
+    // ---------------- Corner Calculations ----------------
     always_comb begin : CALC_CORNERS
 
         // Sign extend, centre_x, centre_y, and diameter always greater or equal to 0
@@ -142,8 +161,83 @@ module reuleaux(input logic clk, input logic rst_n, input logic [2:0] colour,
     // CIRCLE BLOCKS
     // 1 datapath + 3 FSMs
 
-    
+    // ---------------- Circle Blocks ----------------
 
+
+    circle #(1) CIRC_1 (
+        .clk      (clk),
+        .rst_n    (rst_n),
+        .centre_x (c_x1),
+        .centre_y (c_y1),
+        .radius   (s_diameter),
+        .start    (start1),
+        .done     (fsm1_done),
+        .vga_x    (circ1_vga_x),
+        .vga_y    (circ1_vga_y),
+        .vga_plot (circ1_vga_plot)    
+    );
+
+    circle #(2) CIRC_2 (
+        .clk      (clk),
+        .rst_n    (rst_n),
+        .centre_x (c_x2),
+        .centre_y (c_y2),
+        .radius   (s_diameter),
+        .start    (start2),
+        .done     (fsm2_done),
+        .vga_x    (circ2_vga_x),
+        .vga_y    (circ2_vga_y),
+        .vga_plot (circ2_vga_plot)    
+    );
+
+    circle #(3) CIRC_3 (
+        .clk      (clk),
+        .rst_n    (rst_n),
+        .centre_x (c_x3),
+        .centre_y (c_y3),
+        .radius   (s_diameter),
+        .start    (start3),
+        .done     (fsm3_done),
+        .vga_x    (circ3_vga_x),
+        .vga_y    (circ3_vga_y),
+        .vga_plot (circ3_vga_plot)    
+    );
+
+    // ---------------- Top Level Screen Check ----------------
+
+    always_comb begin : CIRCLE_SEL_MUX
+        case ({start1,start2,start3})
+            3'b100  : begin
+                circle_vga_x    = circ1_vga_x;
+                circle_vga_y    = circ1_vga_y;
+                circle_vga_plot = circ1_vga_plot;
+            end
+            3'b010  : begin
+                circle_vga_x    = circ2_vga_x;
+                circle_vga_y    = circ2_vga_y;
+                circle_vga_plot = circ2_vga_plot;
+            end
+            3'b001  : begin
+                circle_vga_x    = circ3_vga_x;
+                circle_vga_y    = circ3_vga_y;
+                circle_vga_plot = circ3_vga_plot;
+            end
+            default : begin // EMERGENCY DEFAULT CASE, shouldn't happen
+                circle_vga_x    = circ1_vga_x;
+                circle_vga_y    = circ1_vga_y;
+                circle_vga_plot = circ1_vga_plot;
+            end
+        endcase
+    end 
+    
+    always_comb begin : FINAL_SCREENCHECK
+        case({start1,start2,start3})
+            3'b100 : reul_plot = (circle_vga_x <= c_x3) ? 1'b1 : 1'b0;
+            3'b010 : reul_plot = (circle_vga_x >= c_x3) ? 1'b1 : 1'b0;
+            3'b001 : reul_plot = (circle_vga_x <= c_x1 && circle_vga_x >= c_x2) ? 1'b1 : 1'b0;
+            default : reul_plot = 1'b0;
+        endcase
+    end
 
 endmodule
 
