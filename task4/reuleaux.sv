@@ -46,8 +46,6 @@ module reuleaux(input logic clk, input logic rst_n, input logic [2:0] colour,
     logic signed [M_BIT_SHIFT+7:0] tmp_shifted3;
 
     // CORNER_REGISTERS
-    logic signed [8:0] c_x_reg;
-    logic signed [7:0] c_y_reg;
     logic signed [8:0] c_x1_reg;
     logic signed [7:0] c_y1_reg;
     logic signed [8:0] c_x2_reg;
@@ -105,7 +103,7 @@ module reuleaux(input logic clk, input logic rst_n, input logic [2:0] colour,
     assign vga_y    = (draw_reul == 1'b1) ? circle_vga_y  : clear_y;
     assign vga_plot = (draw_reul == 1'b1) ? reul_vga_plot : fillscreen_plot;
 
-    // ---------------- Corner Calculations ----------------
+    // ---------------- CORNER CALCULATIONS ----------------
     always_comb begin : CALC_CORNERS
 
         // Sign extend, centre_x, centre_y, and diameter always greater or equal to 0
@@ -128,8 +126,6 @@ module reuleaux(input logic clk, input logic rst_n, input logic [2:0] colour,
 
     always_ff @(posedge clk) begin : CORNER_REGISTERS
         if (rst_n == 1'b0) begin
-            c_x_reg  = 8'sd0;
-            c_y_reg  = 7'sd0;
             c_x1_reg = 8'sd0;
             c_y1_reg = 7'sd0;
             c_x2_reg = 8'sd0;
@@ -137,9 +133,7 @@ module reuleaux(input logic clk, input logic rst_n, input logic [2:0] colour,
             c_x3_reg = 8'sd0;
             c_y3_reg = 7'sd0;
         end else begin
-            if (load_corners == 1'b1) begin                
-                c_x_reg  = c_x;
-                c_y_reg  = c_y;
+            if (load_corners == 1'b1) begin
                 c_x1_reg = c_x1;
                 c_y1_reg = c_y1;
                 c_x2_reg = c_x2;
@@ -150,9 +144,7 @@ module reuleaux(input logic clk, input logic rst_n, input logic [2:0] colour,
         end
     end
 
-    // ---------------- Circle Blocks ----------------
-
-    // TODO: fix weird dot in the middle bug
+    // ---------------- CIRCLE BLOCKS ----------------
 
     circle #(1) CIRC_1 (
         .clk      (clk),
@@ -196,8 +188,6 @@ module reuleaux(input logic clk, input logic rst_n, input logic [2:0] colour,
         .vga_plot (circ3_vga_plot)    
     );
 
-    // ---------------- Top Level Screen Check ----------------
-
     always_comb begin : CIRCLE_SEL_MUX
         case ({start1,start2,start3})
             3'b100  : begin
@@ -222,14 +212,17 @@ module reuleaux(input logic clk, input logic rst_n, input logic [2:0] colour,
             end
         endcase
     end 
-    
+
+    // ---------------- TOP LEVEL SCREEN CHECK ----------------    
+    // This block sets plot to 0 when the circle is drawing outside
+    // of the reuleaux triangle using the x coordinate as the indicator
+    // for whether it is out of bounds
     always_comb begin : FINAL_SCREENCHECK
         case({start1,start2,start3})
-            3'b100  : reul_vga_plot = (circle_vga_x <= c_x3) ? 1'b1 : 1'b0;
-            3'b010  : reul_vga_plot = (circle_vga_x >= c_x3) ? 1'b1 : 1'b0;
-            3'b001  : reul_vga_plot = (circle_vga_x <= c_x1 && circle_vga_x >= c_x2) ? 1'b1 : 1'b0;
+            3'b100  : reul_vga_plot = (circle_vga_x <= c_x3) ? circle_vga_plot : 1'b0;
+            3'b010  : reul_vga_plot = (circle_vga_x >= c_x3) ? circle_vga_plot : 1'b0;
+            3'b001  : reul_vga_plot = (circle_vga_x <= c_x1 && circle_vga_x >= c_x2) ? circle_vga_plot : 1'b0;
             default : reul_vga_plot = 1'b0;
-            // default : reul_vga_plot = 1'b1;
         endcase
     end
 

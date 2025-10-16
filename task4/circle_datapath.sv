@@ -40,8 +40,6 @@ module datapath #(
 );
 
     // ---------------- INTERNAL SIGNALS ----------------
-    // logic signed   [CRIT_DW-1:0] next_crit;
-
     logic unsigned [VGA_X_DW-1:0] circle_x; 
     logic unsigned [VGA_Y_DW-1:0] circle_y;
     logic unsigned [VGA_X_DW-1:0] clear_x; 
@@ -73,10 +71,6 @@ module datapath #(
     logic signed  [OFFSET_Y_DW-1:0] calc_offset_y;  
 
     // ---------------- TOP LEVEL MUX ----------------
-    // assign vga_x = (draw_circle) ? circle_x   : clear_x;
-    // assign vga_y = (draw_circle) ? circle_y   : clear_y;
-    // assign plot  = (draw_circle) ? circle_plot: fillscreen_plot;
-
     assign vga_x =  circle_x;
     assign vga_y =  circle_y;
     assign plot  =  circle_plot;
@@ -165,16 +159,5 @@ module datapath #(
         circle_plot = (circle_int_x <= 'sd159 && circle_int_x >= 'sd0 &&
                        circle_int_y <= 'sd119 && circle_int_y >= 'sd0) ? 1'b1 : 1'b0;
     end
-
-    // // ---------------- FILL_SCREEN INST ----------------
-    // fillscreen u_fillscreen (
-    //     .clk           (clk),
-    //     .rst_n         (resetn),
-    //     .start         (fill_start),
-    //     .done          (fill_done),
-    //     .vga_x         (clear_x),
-    //     .vga_y         (clear_y),
-    //     .vga_plot      (fillscreen_plot)
-    // );
 
 endmodule

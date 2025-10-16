@@ -35,11 +35,6 @@ module circle#(
      assign centre_y_sgn = {1'b0, centre_y};
      assign radius_sgn   = {1'b0, radius};
 
-     // Other Signals
-     logic dp_vga_plot;
-
-     assign vga_plot = (done == 1'b1) ? 1'b0 : 1'b1;
-
      datapath DP(
           .clk         (clk),
           .resetn      (rst_n),
@@ -62,7 +57,7 @@ module circle#(
 
           .vga_x       (vga_x),
           .vga_y       (vga_y),
-          .plot        (dp_vga_plot)
+          .plot        (vga_plot)
      );
 
      circle_fsm #(SEGMENT_TYPE) CIRCLE_FSM(
