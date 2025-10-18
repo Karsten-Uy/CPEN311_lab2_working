@@ -37,13 +37,12 @@ module triangle_test_seq (
         // random_centre();
         // random_centre();
 
-        task4_test();
-
-        
+        task4_test();        
 
         // Randomize centres many times to catch errors
         // repeat(50) begin
-        //     random_centre(.early_clear(1));
+        //     // random_centre(.early_clear(1));
+        //     random_centre();
         // end
     endtask
 
@@ -88,6 +87,9 @@ module triangle_test_seq (
         //     if (early_clear) force_early_clear();
         //     wait_done_and_deassert(); 
         // join
+
+        vif.start = 1'b0;
+        @(posedge vif.clk);
     endtask
 
     

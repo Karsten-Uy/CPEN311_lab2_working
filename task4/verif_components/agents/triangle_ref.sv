@@ -89,19 +89,9 @@ module triangle_ref (triangle_if vif, phases phases);
         // Clear Screen
         fillscreen();
         
-        // @(posedge vif.clk); // Wait fill done signal
         ref_state = triangle_ref_pkg::DRAW_TRIANGLE;
 
         $display("[%0t ns][ref_model] Running triangle Drawing", $time);
-        // draw_circle_segment(vif.diameter, c_x2, c_y2, GREEN); @(posedge vif.clk); // Wait done
-        // draw_circle_segment(vif.diameter, c_x1, c_y1, BLUE);  @(posedge vif.clk); // Wait done
-        // draw_circle_segment(vif.diameter, c_x3, c_y3, RED);   @(posedge vif.clk); // Wait done
-
-
-
-        // vif.vga_x = c_x1;
-        // vif.vga_y = c_y1;
-
         @(posedge vif.clk); 
 
         vif.vga_x = 0;
@@ -110,11 +100,6 @@ module triangle_ref (triangle_if vif, phases phases);
         draw_circle_segment(vif.diameter, c_x1, c_y1, BLUE); @(posedge vif.clk); // Wait done
         draw_circle_segment(vif.diameter, c_x2, c_y2, GREEN);  @(posedge vif.clk); // Wait done
         draw_circle_segment(vif.diameter, c_x3, c_y3, RED);   @(posedge vif.clk); // Wait done
-
-        /*
-            I think reference model is doing something different, drawing the line from 1 corner to another while the 
-            actual one draws from 2 points, alternating
-        */
 
         @(posedge vif.clk); 
 
@@ -163,9 +148,6 @@ module triangle_ref (triangle_if vif, phases phases);
         offset_y = 0;
         offset_x = radius;
         crit     = 1 - radius;
-
-        // vif.vga_x = 0;
-        // vif.vga_y = 0;
         
         vif.vga_plot = 1'b0;
 
@@ -228,27 +210,8 @@ module triangle_ref (triangle_if vif, phases phases);
     endtask
 
     task setPixel(int x, int y, e_segment_type SEGMENT_TYPE);
+
         @(posedge vif.clk);
-
-        // if (seg_valid(x, SEGMENT_TYPE)) begin
-
-        //     if (inside_x(x)) vif.vga_x = x;
-        //     else             vif.vga_x = 'b0;
-
-
-        //     if (inside_y(y)) vif.vga_y = y;
-        //     else             vif.vga_y = 'b0;
-
-        //     if (inside_x(x) && inside_y(y)) vif.vga_plot = 1'b1;
-        //     else vif.vga_plot = 1'b0;
-
-        //     $display("%d,%d", vif.vga_x, vif.vga_y);
-        // end
-        // else begin
-        //     vif.vga_x    =  'b0;
-        //     vif.vga_y    =  'b0;
-        //     vif.vga_plot = 1'b0;
-        // end
 
         if (inside_x(x)) vif.vga_x = x;
         else             vif.vga_x = 'b0;
@@ -257,16 +220,12 @@ module triangle_ref (triangle_if vif, phases phases);
         else             vif.vga_y = 'b0;
 
         if (seg_valid(x, SEGMENT_TYPE)) begin
-
             if (inside_x(x) && inside_y(y)) vif.vga_plot = 1'b1;
-
             // $display("%d,%d", vif.vga_x, vif.vga_y);
         end
         else begin
             vif.vga_plot = 1'b0;
-        end
-
-        
+        end        
 
         @(negedge vif.clk);
     endtask
