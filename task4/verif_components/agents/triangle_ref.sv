@@ -73,6 +73,10 @@ module triangle_ref (triangle_if vif, phases phases);
     task ref_main();
 
         @(posedge vif.clk); // Load state
+
+        /*
+            NOTE: i think the real numbers are truncated here
+        */
         c_x = vif.centre_x;
         c_y = vif.centre_y;
         c_x1 = c_x + vif.diameter/2;
@@ -99,9 +103,10 @@ module triangle_ref (triangle_if vif, phases phases);
         draw_circle_segment(vif.diameter, c_x2, c_y2, GREEN);  @(posedge vif.clk); // Wait done
         draw_circle_segment(vif.diameter, c_x3, c_y3, RED);   @(posedge vif.clk); // Wait done
 
+        vif.done  <= 1'b1;
+
         @(posedge vif.clk); 
 
-        vif.done  <= 1'b1;
         vif.vga_x <=  'b0;
         vif.vga_y <=  'b0;
         ref_state = triangle_ref_pkg::REF_DONE;
@@ -187,6 +192,8 @@ module triangle_ref (triangle_if vif, phases phases);
                 else vif.vga_y = 0;
             end
         endcase
+
+        vif.vga_plot = 1'b0;
 
         @(posedge vif.clk); 
 

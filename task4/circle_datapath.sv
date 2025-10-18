@@ -155,9 +155,12 @@ module datapath #(
     always_comb begin : screen_check
         circle_x = (circle_int_x <= 'sd159 && circle_int_x >= 'sd0) ? circle_int_x[VGA_X_DW-1:0] : 'b0;
         circle_y = (circle_int_y <= 'sd119 && circle_int_y >= 'sd0) ? circle_int_y[VGA_Y_DW-1:0] : 'b0;
-
-        circle_plot = (circle_int_x <= 'sd159 && circle_int_x >= 'sd0 &&
-                       circle_int_y <= 'sd119 && circle_int_y >= 'sd0) ? 1'b1 : 1'b0;
+        
+        // Ensure plot is not enabled during pre-draw stages
+        if (octant_sel != 3'd0) begin
+            circle_plot = (circle_int_x <= 'sd159 && circle_int_x >= 'sd0 &&
+                           circle_int_y <= 'sd119 && circle_int_y >= 'sd0) ? 1'b1 : 1'b0;
+        end else circle_plot = 1'b0;
     end
 
 endmodule

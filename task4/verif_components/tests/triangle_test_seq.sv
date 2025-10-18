@@ -37,16 +37,17 @@ module triangle_test_seq (
         // random_centre();
         // random_centre();
 
-        // task4_test();        
+        task4_test();   
+        dir_test1();
+        dir_test2();
+        // dir_test3();
 
         // Randomize centres many times to catch errors
         // repeat(50) begin
-        repeat(10) begin
-            // random_centre(.early_clear(1));
-            random_centre();
-        end
-
-        // dir_test1();
+        // repeat(10) begin
+        //     // random_centre(.early_clear(1));
+        //     random_centre();
+        // end
     endtask
 
     task force_early_clear();
@@ -81,7 +82,7 @@ module triangle_test_seq (
     task random_centre(bit early_clear=0);
         vif.centre_x = $urandom_range(60, 120); 
         vif.centre_y = $urandom_range(40, 60);
-        vif.diameter = $urandom_range(60, 100) & ~1;
+        vif.diameter = $urandom_range(60, 100) & ~1; // force even
         vif.start = 1'b1;
 
         $display("[%0t ns] starting random_centre with arguments:", $time);
@@ -101,10 +102,16 @@ module triangle_test_seq (
 
     
     task task4_test(bit early_clear=0);
+
         vif.centre_x = 80;
         vif.centre_y = 60;
         vif.diameter = 80;
         vif.start = 1'b1;
+
+        $display("[%0t ns] starting task4_test with arguments:", $time);
+        $display("  centre_x = %d", vif.centre_x);
+        $display("  centre_y = %d", vif.centre_y);
+        $display("  diameter = %d", vif.diameter);
 
         repeat(20_000) @(posedge vif.clk);
         
@@ -117,6 +124,47 @@ module triangle_test_seq (
         vif.centre_y = 47;
         vif.diameter = 88;
         vif.start = 1'b1;
+
+        $display("[%0t ns] starting dir_test1 with arguments:", $time);
+        $display("  centre_x = %d", vif.centre_x);
+        $display("  centre_y = %d", vif.centre_y);
+        $display("  diameter = %d", vif.diameter);
+
+        repeat(20_000) @(posedge vif.clk);
+        
+        vif.start = 1'b0;
+        @(posedge vif.clk);
+    endtask
+
+    task dir_test2(bit early_clear=0);
+
+        vif.centre_x = 96;
+        vif.centre_y = 43;
+        vif.diameter = 64;
+        vif.start = 1'b1;
+
+        $display("[%0t ns] starting dir_test2 with arguments:", $time);
+        $display("  centre_x = %d", vif.centre_x);
+        $display("  centre_y = %d", vif.centre_y);
+        $display("  diameter = %d", vif.diameter);
+
+        repeat(20_000) @(posedge vif.clk);
+        
+        vif.start = 1'b0;
+        @(posedge vif.clk);
+    endtask
+
+    task dir_test3(bit early_clear=0);
+
+        vif.centre_x = 112;
+        vif.centre_y = 47;
+        vif.diameter = 86;
+        vif.start = 1'b1;
+
+        $display("[%0t ns] starting dir_test3 with arguments:", $time);
+        $display("  centre_x = %d", vif.centre_x);
+        $display("  centre_y = %d", vif.centre_y);
+        $display("  diameter = %d", vif.diameter);
 
         repeat(20_000) @(posedge vif.clk);
         

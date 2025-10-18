@@ -30,6 +30,9 @@ module circle#(
      logic signed  [8:0]  centre_x_sgn;
      logic signed  [7:0]  centre_y_sgn;
      logic signed  [8:0]  radius_sgn;
+     logic unsigned dp_vga_plot;
+
+     assign vga_plot = (done == 1'b0) ? dp_vga_plot : 1'b0;
 
      assign centre_x_sgn = {1'b0, centre_x};
      assign centre_y_sgn = {1'b0, centre_y};
@@ -57,7 +60,7 @@ module circle#(
 
           .vga_x       (vga_x),
           .vga_y       (vga_y),
-          .plot        (vga_plot)
+          .plot        (dp_vga_plot)
      );
 
      circle_fsm #(SEGMENT_TYPE) CIRCLE_FSM(

@@ -118,16 +118,19 @@ module reuleaux(input logic clk, input logic rst_n, input logic [2:0] colour,
         tmp_shifted1_1 = diameter * SQRT_3_DIV_6;
         tmp_shifted1_2 = (c_y << M_BIT_SHIFT) + tmp_shifted1_1;
         c_y1 = (tmp_shifted1_2 >> M_BIT_SHIFT);
+        // c_y1 = (tmp_shifted1_2 + (1 << (M_BIT_SHIFT-1))) >> M_BIT_SHIFT;
 
         c_x2 = c_x - (s_diameter >> 1);
         tmp_shifted2_1 = diameter * SQRT_3_DIV_6;
         tmp_shifted2_2 = (c_y << M_BIT_SHIFT) + tmp_shifted2_1;
         c_y2 = (tmp_shifted2_2 >> M_BIT_SHIFT);
+        // c_y2 = (tmp_shifted2_2 + (1 << (M_BIT_SHIFT-1))) >> M_BIT_SHIFT;
 
         c_x3 = c_x;
         tmp_shifted3_1 = diameter * SQRT_3_DIV_3;
         tmp_shifted3_2 = (c_y << M_BIT_SHIFT) - tmp_shifted3_1;
         c_y3 = (tmp_shifted3_2 >> M_BIT_SHIFT);
+        // c_y3 = (tmp_shifted3_2 - (1 << (M_BIT_SHIFT-1))) >> M_BIT_SHIFT;
 
     end
 
