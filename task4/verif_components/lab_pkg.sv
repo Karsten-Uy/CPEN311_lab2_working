@@ -19,7 +19,7 @@ package lab_pkg;
     // floor(sqrt(3)/6*2^8)
     parameter logic signed [8:0] SQRT_3_DIV_6 = 9'sd74;
     // floor(sqrt(3)/3*2^8)
-    parameter logic signed [8:0] SQRT_3_DIV_3 = 9'sd148;
+    parameter logic signed [8:0] SQRT_3_DIV_3 = 9'sd147;
     
     ///////////////////////////////////////////////////////////
     // circle assets

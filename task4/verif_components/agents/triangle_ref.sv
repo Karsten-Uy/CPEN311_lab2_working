@@ -40,7 +40,6 @@ module triangle_ref (triangle_if vif, phases phases);
     int c_y2;
     int c_y3;
 
-
     // Monitor start signals
     task run();
         event start_trig;
@@ -70,7 +69,6 @@ module triangle_ref (triangle_if vif, phases phases);
             @(start_trig);
         end
     endtask
-
 
     task ref_main();
 
@@ -158,21 +156,37 @@ module triangle_ref (triangle_if vif, phases phases);
         case(SEGMENT_TYPE)
             GREEN: begin 
                 vif.vga_x = c_x2;
-                vif.vga_y = c_y2;
+                if (c_y2 > 0) begin 
+                    vif.vga_y = c_y2;
+                    if (seg_valid(vif.vga_x, SEGMENT_TYPE)) begin
+                        vif.vga_plot = 1'b1;
+                    end
+                end
+                else vif.vga_y = 0;
             end
             BLUE : begin 
                 vif.vga_x = c_x1;
                 vif.vga_y = c_y1;
+                if (c_y1 > 0) begin
+                    vif.vga_y = c_y1;
+                    if (seg_valid(vif.vga_x, SEGMENT_TYPE)) begin
+                        vif.vga_plot = 1'b1;
+                    end
+                end
+                else vif.vga_y = 0;
             end
             RED  : begin 
                 vif.vga_x = c_x3;
                 vif.vga_y = c_y3;
+                if (c_y3 > 0) begin 
+                    vif.vga_y = c_y3;
+                    if (seg_valid(vif.vga_x, SEGMENT_TYPE)) begin
+                        vif.vga_plot = 1'b1;
+                    end
+                end
+                else vif.vga_y = 0;
             end
         endcase
-
-        if (seg_valid(vif.vga_x, SEGMENT_TYPE)) begin
-            vif.vga_plot = 1'b1;
-        end
 
         @(posedge vif.clk); 
 
@@ -221,6 +235,7 @@ module triangle_ref (triangle_if vif, phases phases);
 
         if (seg_valid(x, SEGMENT_TYPE)) begin
             if (inside_x(x) && inside_y(y)) vif.vga_plot = 1'b1;
+            else vif.vga_plot = 1'b0;
             // $display("%d,%d", vif.vga_x, vif.vga_y);
         end
         else begin

@@ -41,9 +41,12 @@ module reuleaux(input logic clk, input logic rst_n, input logic [2:0] colour,
     logic signed [7:0] c_y2;
     logic signed [8:0] c_x3;
     logic signed [7:0] c_y3;
-    logic signed [M_BIT_SHIFT+7:0] tmp_shifted1;
-    logic signed [M_BIT_SHIFT+7:0] tmp_shifted2;
-    logic signed [M_BIT_SHIFT+7:0] tmp_shifted3;
+    logic signed [M_BIT_SHIFT+7:0] tmp_shifted1_1;
+    logic signed [M_BIT_SHIFT+7:0] tmp_shifted1_2;
+    logic signed [M_BIT_SHIFT+7:0] tmp_shifted2_1;
+    logic signed [M_BIT_SHIFT+7:0] tmp_shifted2_2;
+    logic signed [M_BIT_SHIFT+7:0] tmp_shifted3_1;
+    logic signed [M_BIT_SHIFT+7:0] tmp_shifted3_2;
 
     // CORNER_REGISTERS
     logic signed [8:0] c_x1_reg;
@@ -109,18 +112,22 @@ module reuleaux(input logic clk, input logic rst_n, input logic [2:0] colour,
         // Sign extend, centre_x, centre_y, and diameter always greater or equal to 0
         c_x        = {1'sb0, centre_x};
         c_y        = {1'sb0, centre_y};
-        s_diameter = {1'sb0, diameter};        
+        s_diameter = {1'sb0, diameter};    
 
-        // Circle 1 corner calculation
         c_x1 = c_x + (s_diameter >> 1);
-        tmp_shifted1 = diameter * SQRT_3_DIV_6;
-        c_y1 = c_y + (tmp_shifted1 >> M_BIT_SHIFT);
+        tmp_shifted1_1 = diameter * SQRT_3_DIV_6;
+        tmp_shifted1_2 = (c_y << M_BIT_SHIFT) + tmp_shifted1_1;
+        c_y1 = (tmp_shifted1_2 >> M_BIT_SHIFT);
+
         c_x2 = c_x - (s_diameter >> 1);
-        tmp_shifted2 = diameter * SQRT_3_DIV_6;
-        c_y2 = c_y + (tmp_shifted2 >> M_BIT_SHIFT);
+        tmp_shifted2_1 = diameter * SQRT_3_DIV_6;
+        tmp_shifted2_2 = (c_y << M_BIT_SHIFT) + tmp_shifted2_1;
+        c_y2 = (tmp_shifted2_2 >> M_BIT_SHIFT);
+
         c_x3 = c_x;
-        tmp_shifted3 = diameter * SQRT_3_DIV_3;
-        c_y3 = c_y - (tmp_shifted3 >> M_BIT_SHIFT);
+        tmp_shifted3_1 = diameter * SQRT_3_DIV_3;
+        tmp_shifted3_2 = (c_y << M_BIT_SHIFT) - tmp_shifted3_1;
+        c_y3 = (tmp_shifted3_2 >> M_BIT_SHIFT);
 
     end
 
