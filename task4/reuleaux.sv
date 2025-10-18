@@ -219,9 +219,9 @@ module reuleaux(input logic clk, input logic rst_n, input logic [2:0] colour,
     // for whether it is out of bounds
     always_comb begin : FINAL_SCREENCHECK
         case({start1,start2,start3})
-            3'b100  : reul_vga_plot = (circle_vga_x <= c_x3) ? circle_vga_plot : 1'b0;
-            3'b010  : reul_vga_plot = (circle_vga_x >= c_x3) ? circle_vga_plot : 1'b0;
-            3'b001  : reul_vga_plot = (circle_vga_x <= c_x1 && circle_vga_x >= c_x2) ? circle_vga_plot : 1'b0;
+            3'b100  : reul_vga_plot = (circle_vga_x <= c_x3_reg) ? circle_vga_plot : 1'b0;
+            3'b010  : reul_vga_plot = (circle_vga_x >= c_x3_reg) ? circle_vga_plot : 1'b0;
+            3'b001  : reul_vga_plot = (circle_vga_x <= c_x1_reg && circle_vga_x >= c_x2_reg) ? circle_vga_plot : 1'b0;
             default : reul_vga_plot = 1'b0;
         endcase
     end

@@ -124,16 +124,24 @@ module triangle_monitor (
 
             if((ref_model.ref_state == triangle_ref_pkg::DRAW_TRIANGLE) && (ref_model.ref_state != lab_pkg::REUL_BLACK)) begin
                 // Checks that x, y and color match with reference model
-                if (vif.vga_x != ref_if.vga_x ) begin
+                if (vif.vga_plot != ref_if.vga_plot) begin
                     Mismatch = 1;
-                    $error("Mismatch in vga_x. exp=%0d, axp=%0d", ref_if.vga_x, vif.vga_x);
+                    $error("vga plot signals not matching");
                     ERROR_COUNT += 1;
                 end
 
-                if (vif.vga_y != ref_if.vga_y) begin
-                    Mismatch = 1;
-                    $error("Mismatch in vga_y. exp=%0d, axp=%0d", ref_if.vga_x, vif.vga_y);
-                    ERROR_COUNT += 1;
+                if (ref_if.vga_plot == 1'b1) begin
+                    if (vif.vga_x != ref_if.vga_x ) begin
+                        Mismatch = 1;
+                        $error("Mismatch in vga_x. exp=%0d, axp=%0d", ref_if.vga_x, vif.vga_x);
+                        ERROR_COUNT += 1;
+                    end
+
+                    if (vif.vga_y != ref_if.vga_y) begin
+                        Mismatch = 1;
+                        $error("Mismatch in vga_y. exp=%0d, axp=%0d", ref_if.vga_x, vif.vga_y);
+                        ERROR_COUNT += 1;
+                    end
                 end
             end
 

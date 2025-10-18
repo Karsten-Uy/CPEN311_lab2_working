@@ -84,16 +84,39 @@ module triangle_ref (triangle_if vif, phases phases);
         c_x3 = c_x;
         c_y3 = c_y - vif.diameter * $sqrt(3)/3;
 
+        vif.done  <= 1'b0;
+
         // Clear Screen
         fillscreen();
         
-        @(posedge vif.clk); // Wait fill done signal
+        // @(posedge vif.clk); // Wait fill done signal
         ref_state = triangle_ref_pkg::DRAW_TRIANGLE;
 
         $display("[%0t ns][ref_model] Running triangle Drawing", $time);
-        draw_circle_segment(vif.diameter, c_x2, c_y2, GREEN); @(posedge vif.clk); // Wait done
-        draw_circle_segment(vif.diameter, c_x1, c_y1, BLUE);  @(posedge vif.clk); // Wait done
+        // draw_circle_segment(vif.diameter, c_x2, c_y2, GREEN); @(posedge vif.clk); // Wait done
+        // draw_circle_segment(vif.diameter, c_x1, c_y1, BLUE);  @(posedge vif.clk); // Wait done
+        // draw_circle_segment(vif.diameter, c_x3, c_y3, RED);   @(posedge vif.clk); // Wait done
+
+
+
+        // vif.vga_x = c_x1;
+        // vif.vga_y = c_y1;
+
+        @(posedge vif.clk); 
+
+        vif.vga_x = 0;
+        vif.vga_y = 0;
+
+        draw_circle_segment(vif.diameter, c_x1, c_y1, BLUE); @(posedge vif.clk); // Wait done
+        draw_circle_segment(vif.diameter, c_x2, c_y2, GREEN);  @(posedge vif.clk); // Wait done
         draw_circle_segment(vif.diameter, c_x3, c_y3, RED);   @(posedge vif.clk); // Wait done
+
+        /*
+            I think reference model is doing something different, drawing the line from 1 corner to another while the 
+            actual one draws from 2 points, alternating
+        */
+
+        @(posedge vif.clk); 
 
         vif.done  <= 1'b1;
         vif.vga_x <=  'b0;
@@ -129,15 +152,47 @@ module triangle_ref (triangle_if vif, phases phases);
     endtask
 
     task draw_circle_segment(int radius, int centre_x, int centre_y, e_segment_type SEGMENT_TYPE);
+
+
         int offset_x;
         int offset_y;
         int crit;
 
-        $display("Drawing segment type %s", SEGMENT_TYPE.name());
+        $display("[%0t ns] Drawing segment type %s", $time, SEGMENT_TYPE.name());
 
         offset_y = 0;
         offset_x = radius;
         crit     = 1 - radius;
+
+        // vif.vga_x = 0;
+        // vif.vga_y = 0;
+        
+        vif.vga_plot = 1'b0;
+
+        @(posedge vif.clk); 
+
+        vif.vga_colour = vif.colour;
+
+        case(SEGMENT_TYPE)
+            GREEN: begin 
+                vif.vga_x = c_x2;
+                vif.vga_y = c_y2;
+            end
+            BLUE : begin 
+                vif.vga_x = c_x1;
+                vif.vga_y = c_y1;
+            end
+            RED  : begin 
+                vif.vga_x = c_x3;
+                vif.vga_y = c_y3;
+            end
+        endcase
+
+        if (seg_valid(vif.vga_x, SEGMENT_TYPE)) begin
+            vif.vga_plot = 1'b1;
+        end
+
+        @(posedge vif.clk); 
 
         while (offset_y <= offset_x) begin
             case(SEGMENT_TYPE)
@@ -175,25 +230,43 @@ module triangle_ref (triangle_if vif, phases phases);
     task setPixel(int x, int y, e_segment_type SEGMENT_TYPE);
         @(posedge vif.clk);
 
+        // if (seg_valid(x, SEGMENT_TYPE)) begin
+
+        //     if (inside_x(x)) vif.vga_x = x;
+        //     else             vif.vga_x = 'b0;
+
+
+        //     if (inside_y(y)) vif.vga_y = y;
+        //     else             vif.vga_y = 'b0;
+
+        //     if (inside_x(x) && inside_y(y)) vif.vga_plot = 1'b1;
+        //     else vif.vga_plot = 1'b0;
+
+        //     $display("%d,%d", vif.vga_x, vif.vga_y);
+        // end
+        // else begin
+        //     vif.vga_x    =  'b0;
+        //     vif.vga_y    =  'b0;
+        //     vif.vga_plot = 1'b0;
+        // end
+
+        if (inside_x(x)) vif.vga_x = x;
+        else             vif.vga_x = 'b0;
+
+        if (inside_y(y)) vif.vga_y = y;
+        else             vif.vga_y = 'b0;
+
         if (seg_valid(x, SEGMENT_TYPE)) begin
 
-            if (inside_x(x)) vif.vga_x = x;
-            else             vif.vga_x = 'b0;
-
-
-            if (inside_y(y)) vif.vga_y = y;
-            else             vif.vga_y = 'b0;
-
             if (inside_x(x) && inside_y(y)) vif.vga_plot = 1'b1;
-            else vif.vga_plot = 1'b0;
 
-            $display("%d,%d", vif.vga_x, vif.vga_y);
+            // $display("%d,%d", vif.vga_x, vif.vga_y);
         end
         else begin
-            vif.vga_x    =  'b0;
-            vif.vga_y    =  'b0;
             vif.vga_plot = 1'b0;
         end
+
+        
 
         @(negedge vif.clk);
     endtask

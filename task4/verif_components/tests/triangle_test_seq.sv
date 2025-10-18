@@ -34,8 +34,10 @@ module triangle_test_seq (
         vif.colour = 3'b101;
 
         // Test that multiple iterations operate properly
-        random_centre();
         // random_centre();
+        // random_centre();
+
+        task4_test();
 
         
 
@@ -79,6 +81,21 @@ module triangle_test_seq (
         vif.centre_y = $urandom_range(40, 60);
 
         vif.diameter = $urandom_range(60, 100);
+        vif.start = 1'b1;
+
+        repeat(20_000) @(posedge vif.clk);
+        // fork
+        //     if (early_clear) force_early_clear();
+        //     wait_done_and_deassert(); 
+        // join
+    endtask
+
+    
+    task task4_test(bit early_clear=0);
+        vif.centre_x = 80;
+        vif.centre_y = 60;
+
+        vif.diameter = 80;
         vif.start = 1'b1;
 
         repeat(20_000) @(posedge vif.clk);
