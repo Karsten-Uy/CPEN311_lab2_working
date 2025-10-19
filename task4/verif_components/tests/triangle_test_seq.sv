@@ -29,25 +29,20 @@ module triangle_test_seq (
     endtask // start
 
     task run();
+
         vif.forced_early_clear = 1'b0;
-
-
         task4_test();  
-        dir_test1();
 
-        // repeat(5) corner_test_cases();
+        repeat(50) zero_test();
+
+        // corner_test_cases();
+        repeat(50) corner_test_cases();
 
         // Randomize centres many times to catch errors
         repeat(200) begin
             random_centre();
         end
 
-        // random_centre();
-
-        // repeat(10) begin
-        //     // random_centre(.early_clear(1));
-        //     random_centre();
-        // end
     endtask
 
     task force_early_clear();
@@ -82,7 +77,7 @@ module triangle_test_seq (
     task random_centre(bit early_clear=0);
         vif.centre_x = $urandom_range(0, 159); 
         vif.centre_y = $urandom_range(0, 119);
-        vif.diameter = $urandom_range(10, 120) & ~1; // force even
+        vif.diameter = $urandom_range(0,255) & ~1; // force even;
         vif.colour = $urandom_range(0, 7);
         vif.start = 1'b1;
 
@@ -112,43 +107,15 @@ module triangle_test_seq (
         wait_done_and_deassert();
     endtask
 
-    task dir_test1(bit early_clear=0);
-        vif.centre_x = 47;
-        vif.centre_y = 65;
-        vif.diameter = 50;
+    task zero_test(bit early_clear=0);
+
+        vif.centre_x = $urandom_range(0, 159); 
+        vif.centre_y = $urandom_range(0, 119);
+        vif.diameter = 0;
         vif.start = 1'b1;
+        vif.colour = $urandom_range(0, 7);
 
-        $display("[%0t ns] starting dir_test1 with arguments:", $time);
-        $display("  centre_x = %d", vif.centre_x);
-        $display("  centre_y = %d", vif.centre_y);
-        $display("  diameter = %d", vif.diameter);
-
-        wait_done_and_deassert();
-    endtask
-
-    task dir_test2(bit early_clear=0);
-
-        vif.centre_x = 96;
-        vif.centre_y = 43;
-        vif.diameter = 64;
-        vif.start = 1'b1;
-
-        $display("[%0t ns] starting dir_test2 with arguments:", $time);
-        $display("  centre_x = %d", vif.centre_x);
-        $display("  centre_y = %d", vif.centre_y);
-        $display("  diameter = %d", vif.diameter);
-
-        wait_done_and_deassert();
-    endtask
-
-    task dir_test3(bit early_clear=0);
-
-        vif.centre_x = 6;
-        vif.centre_y = 59;
-        vif.diameter = 78;
-        vif.start = 1'b1;
-
-        $display("[%0t ns] starting dir_test3 with arguments:", $time);
+        $display("[%0t ns] starting zero_test with arguments:", $time);
         $display("  centre_x = %d", vif.centre_x);
         $display("  centre_y = %d", vif.centre_y);
         $display("  diameter = %d", vif.diameter);

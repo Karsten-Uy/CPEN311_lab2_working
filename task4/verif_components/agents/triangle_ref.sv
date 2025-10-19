@@ -103,6 +103,7 @@ module triangle_ref (triangle_if vif, phases phases);
         draw_circle_segment(vif.diameter, c_x2, c_y2, GREEN);  @(posedge vif.clk); // Wait done
         draw_circle_segment(vif.diameter, c_x3, c_y3, RED);   @(posedge vif.clk); // Wait done
 
+        vif.vga_plot = 1'b0;
         vif.done  <= 1'b1;
 
         @(posedge vif.clk); 

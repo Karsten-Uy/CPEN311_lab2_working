@@ -46,7 +46,8 @@ module tb_rtl_reuleaux();
 
         // Mimic time out
         // repeat(1_000_000) @(posedge dut_if.clk);
-        repeat(5_000_000) @(posedge dut_if.clk);
+        // repeat(5_000_000) @(posedge dut_if.clk);
+        repeat(10_000_000) @(posedge dut_if.clk);
 
         // phases.run_phase = 0;
         // phases.report_phase = 1;

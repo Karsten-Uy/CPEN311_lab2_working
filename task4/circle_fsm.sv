@@ -8,10 +8,10 @@ module circle_fsm#(
     input logic start,
 
     // From Datapath
-    input logic signed [8:0] curr_crit,
-    input logic signed [8:0] offset_x,
-    input logic signed [7:0] offset_y,
-
+    input logic signed [9:0] curr_crit,
+    input logic signed [9:0] offset_x,
+    input logic signed [8:0] offset_y,
+    
     // To Circle
     output logic done,
 

@@ -23,9 +23,10 @@ module circle#(
      logic unsigned       load_x_next;
      logic unsigned       load_y_next;
      logic unsigned       load_crit;
-     logic signed  [8:0]  offset_x;
-     logic signed  [7:0]  offset_y;
-     logic signed  [8:0]  crit;
+
+     logic signed  [9:0]  offset_x;
+     logic signed  [8:0]  offset_y;
+     logic signed  [9:0]  crit;
 
      logic unsigned dp_vga_plot;
 
