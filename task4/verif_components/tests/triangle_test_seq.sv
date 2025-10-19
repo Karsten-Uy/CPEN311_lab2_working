@@ -43,7 +43,7 @@ module triangle_test_seq (
         // dir_test3();
 
         // Randomize centres many times to catch errors
-        repeat(20) begin
+        repeat(40) begin
             random_centre();
         end
 

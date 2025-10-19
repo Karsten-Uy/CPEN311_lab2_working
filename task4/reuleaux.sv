@@ -118,32 +118,20 @@ module reuleaux(input logic clk, input logic rst_n, input logic [2:0] colour,
         c_x1 = c_x + (s_diameter >> 1);
         tmp_shifted1_1 = s_diameter * SQRT_3_DIV_6;
         tmp_shifted1_2 = (c_y << M_BIT_SHIFT) + tmp_shifted1_1;
-        if (tmp_shifted1_2[M_BIT_SHIFT*2] == 1'sb0) // positive numbers
-            if (tmp_shifted1_2[M_BIT_SHIFT-1] == 1'sb1)
-                c_y1 = (tmp_shifted1_2 >> M_BIT_SHIFT) + 'sd1;
-            else
-                c_y1 = (tmp_shifted1_2 >> M_BIT_SHIFT);
-        else // negative numbers
-            if (tmp_shifted1_2[M_BIT_SHIFT-1] == 1'sb1)
-                c_y1 = (tmp_shifted1_2 >> M_BIT_SHIFT) + 'sd1;
-            else
-                c_y1 = (tmp_shifted1_2 >> M_BIT_SHIFT);
+        if (tmp_shifted1_2[M_BIT_SHIFT-1] == 1'sb1) // round
+            c_y1 = (tmp_shifted1_2 >> M_BIT_SHIFT) + 'sd1;
+        else 
+            c_y1 = (tmp_shifted1_2 >> M_BIT_SHIFT);
 
         c_y2 = c_y1; // Same value
 
         c_x3 = c_x;
         tmp_shifted3_1 = s_diameter * SQRT_3_DIV_3;
         tmp_shifted3_2 = (c_y << M_BIT_SHIFT) - tmp_shifted3_1;
-        if (tmp_shifted3_2[M_BIT_SHIFT*2] == 1'sb0) // positive numbers
-            if (tmp_shifted3_2[M_BIT_SHIFT-1] == 1'sb1)
-                c_y3 = (tmp_shifted3_2 >> M_BIT_SHIFT) + 'sd1;
-            else
-                c_y3 = (tmp_shifted3_2 >> M_BIT_SHIFT);
-        else // negative numbers
-            if (tmp_shifted3_2[M_BIT_SHIFT-1] == 1'sb1)
-                c_y3 = (tmp_shifted3_2 >> M_BIT_SHIFT) + 'sd1;
-            else
-                c_y3 = (tmp_shifted3_2 >> M_BIT_SHIFT);
+        if (tmp_shifted3_2[M_BIT_SHIFT-1] == 1'sb1)
+            c_y3 = (tmp_shifted3_2 >> M_BIT_SHIFT) + 'sd1;
+        else
+            c_y3 = (tmp_shifted3_2 >> M_BIT_SHIFT);
     end
 
     always_ff @(posedge clk) begin : CORNER_REGISTERS
