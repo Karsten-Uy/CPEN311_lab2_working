@@ -34,19 +34,19 @@ module reuleaux(input logic clk, input logic rst_n, input logic [2:0] colour,
     // CALC_CORNERS
     logic signed [8:0] c_x;
     logic signed [7:0] c_y;
-    logic signed [8:0] s_diameter;
+    logic signed [M_BIT_SHIFT:0] s_diameter;
     logic signed [8:0] c_x1;
     logic signed [7:0] c_y1;
     logic signed [8:0] c_x2;
     logic signed [7:0] c_y2;
     logic signed [8:0] c_x3;
     logic signed [7:0] c_y3;
-    logic signed [M_BIT_SHIFT+7:0] tmp_shifted1_1;
-    logic signed [M_BIT_SHIFT+7:0] tmp_shifted1_2;
-    logic signed [M_BIT_SHIFT+7:0] tmp_shifted2_1;
-    logic signed [M_BIT_SHIFT+7:0] tmp_shifted2_2;
-    logic signed [M_BIT_SHIFT+7:0] tmp_shifted3_1;
-    logic signed [M_BIT_SHIFT+7:0] tmp_shifted3_2;
+    logic signed [M_BIT_SHIFT*2:0] tmp_shifted1_1;
+    logic signed [M_BIT_SHIFT*2:0] tmp_shifted1_2;
+    logic signed [M_BIT_SHIFT*2:0] tmp_shifted2_1;
+    logic signed [M_BIT_SHIFT*2:0] tmp_shifted2_2;
+    logic signed [M_BIT_SHIFT*2:0] tmp_shifted3_1;
+    logic signed [M_BIT_SHIFT*2:0] tmp_shifted3_2;
 
     // CORNER_REGISTERS
     logic signed [8:0] c_x1_reg;
@@ -112,26 +112,38 @@ module reuleaux(input logic clk, input logic rst_n, input logic [2:0] colour,
         // Sign extend, centre_x, centre_y, and diameter always greater or equal to 0
         c_x        = {1'sb0, centre_x};
         c_y        = {1'sb0, centre_y};
-        s_diameter = {1'sb0, diameter};    
+        s_diameter = {16'sb0, diameter};    
 
+        // (c_y + (diameter * SQRT_3_DIV_6)  << M_BIT_SHIFT)) >> M_BIT_SHIFT
         c_x1 = c_x + (s_diameter >> 1);
-        tmp_shifted1_1 = diameter * SQRT_3_DIV_6;
+        tmp_shifted1_1 = s_diameter * SQRT_3_DIV_6;
         tmp_shifted1_2 = (c_y << M_BIT_SHIFT) + tmp_shifted1_1;
-        c_y1 = (tmp_shifted1_2 >> M_BIT_SHIFT);
-        // c_y1 = (tmp_shifted1_2 + (1 << (M_BIT_SHIFT-1))) >> M_BIT_SHIFT;
+        if (tmp_shifted1_2[M_BIT_SHIFT*2] == 1'sb0) // positive numbers
+            if (tmp_shifted1_2[M_BIT_SHIFT-1] == 1'sb1)
+                c_y1 = (tmp_shifted1_2 >> M_BIT_SHIFT) + 'sd1;
+            else
+                c_y1 = (tmp_shifted1_2 >> M_BIT_SHIFT);
+        else // negative numbers
+            if (tmp_shifted1_2[M_BIT_SHIFT-1] == 1'sb1)
+                c_y1 = (tmp_shifted1_2 >> M_BIT_SHIFT) + 'sd1;
+            else
+                c_y1 = (tmp_shifted1_2 >> M_BIT_SHIFT);
 
-        c_x2 = c_x - (s_diameter >> 1);
-        tmp_shifted2_1 = diameter * SQRT_3_DIV_6;
-        tmp_shifted2_2 = (c_y << M_BIT_SHIFT) + tmp_shifted2_1;
-        c_y2 = (tmp_shifted2_2 >> M_BIT_SHIFT);
-        // c_y2 = (tmp_shifted2_2 + (1 << (M_BIT_SHIFT-1))) >> M_BIT_SHIFT;
+        c_y2 = c_y1; // Same value
 
         c_x3 = c_x;
-        tmp_shifted3_1 = diameter * SQRT_3_DIV_3;
+        tmp_shifted3_1 = s_diameter * SQRT_3_DIV_3;
         tmp_shifted3_2 = (c_y << M_BIT_SHIFT) - tmp_shifted3_1;
-        c_y3 = (tmp_shifted3_2 >> M_BIT_SHIFT);
-        // c_y3 = (tmp_shifted3_2 - (1 << (M_BIT_SHIFT-1))) >> M_BIT_SHIFT;
-
+        if (tmp_shifted3_2[M_BIT_SHIFT*2] == 1'sb0) // positive numbers
+            if (tmp_shifted3_2[M_BIT_SHIFT-1] == 1'sb1)
+                c_y3 = (tmp_shifted3_2 >> M_BIT_SHIFT) + 'sd1;
+            else
+                c_y3 = (tmp_shifted3_2 >> M_BIT_SHIFT);
+        else // negative numbers
+            if (tmp_shifted3_2[M_BIT_SHIFT-1] == 1'sb1)
+                c_y3 = (tmp_shifted3_2 >> M_BIT_SHIFT) + 'sd1;
+            else
+                c_y3 = (tmp_shifted3_2 >> M_BIT_SHIFT);
     end
 
     always_ff @(posedge clk) begin : CORNER_REGISTERS
@@ -161,7 +173,7 @@ module reuleaux(input logic clk, input logic rst_n, input logic [2:0] colour,
         .rst_n    (rst_n),
         .centre_x (c_x1_reg),
         .centre_y (c_y1_reg),
-        .radius   (s_diameter),
+        .radius   (s_diameter[8:0]),
         .start    (start1),
 
         .done     (fsm1_done),
@@ -175,7 +187,7 @@ module reuleaux(input logic clk, input logic rst_n, input logic [2:0] colour,
         .rst_n    (rst_n),
         .centre_x (c_x2_reg),
         .centre_y (c_y2_reg),
-        .radius   (s_diameter),
+        .radius   (s_diameter[8:0]),
         .start    (start2),
 
         .done     (fsm2_done),
@@ -189,7 +201,7 @@ module reuleaux(input logic clk, input logic rst_n, input logic [2:0] colour,
         .rst_n    (rst_n),
         .centre_x (c_x3_reg),
         .centre_y (c_y3_reg),
-        .radius   (s_diameter),
+        .radius   (s_diameter[8:0]),
         .start    (start3),
 
         .done     (fsm3_done),

@@ -14,12 +14,16 @@ package lab_pkg;
         REUL_DONE         
     } triangle_FSM_state;
 
-    parameter M_BIT_SHIFT = 8;
+    parameter M_BIT_SHIFT = 16;
+    // parameter M_BIT_SHIFT = 8;
+    
 
-    // floor(sqrt(3)/6*2^8)
-    parameter logic signed [8:0] SQRT_3_DIV_6 = 9'sd74;
-    // floor(sqrt(3)/3*2^8)
-    parameter logic signed [8:0] SQRT_3_DIV_3 = 9'sd147;
+    // floor(sqrt(3)/6*2^16)
+    // parameter logic signed [8:0] SQRT_3_DIV_6 = 9'sd74;
+    parameter logic signed [16:0] SQRT_3_DIV_6 = 'sd18918;
+    // floor(sqrt(3)/3*2^16)
+    // parameter logic signed [8:0] SQRT_3_DIV_3 = 9'sd147;
+    parameter logic signed [16:0] SQRT_3_DIV_3 = 'sd37837;
     
     ///////////////////////////////////////////////////////////
     // circle assets
