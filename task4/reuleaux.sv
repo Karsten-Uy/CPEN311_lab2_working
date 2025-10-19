@@ -35,12 +35,12 @@ module reuleaux(input logic clk, input logic rst_n, input logic [2:0] colour,
     logic signed [8:0] c_x;
     logic signed [7:0] c_y;
     logic signed [M_BIT_SHIFT:0] s_diameter;
-    logic signed [8:0] c_x1;
-    logic signed [7:0] c_y1;
-    logic signed [8:0] c_x2;
-    logic signed [7:0] c_y2;
-    logic signed [8:0] c_x3;
-    logic signed [7:0] c_y3;
+    logic signed [9:0] c_x1; // Must be larger than c_x to account for centres bounds
+    logic signed [8:0] c_y1;
+    logic signed [9:0] c_x2;
+    logic signed [8:0] c_y2;
+    logic signed [9:0] c_x3;
+    logic signed [8:0] c_y3;
     logic signed [M_BIT_SHIFT*2:0] tmp_shifted1_1;
     logic signed [M_BIT_SHIFT*2:0] tmp_shifted1_2;
     logic signed [M_BIT_SHIFT*2:0] tmp_shifted2_1;
@@ -49,12 +49,12 @@ module reuleaux(input logic clk, input logic rst_n, input logic [2:0] colour,
     logic signed [M_BIT_SHIFT*2:0] tmp_shifted3_2;
 
     // CORNER_REGISTERS
-    logic signed [8:0] c_x1_reg;
-    logic signed [7:0] c_y1_reg;
-    logic signed [8:0] c_x2_reg;
-    logic signed [7:0] c_y2_reg;
-    logic signed [8:0] c_x3_reg;
-    logic signed [7:0] c_y3_reg;
+    logic signed [9:0] c_x1_reg;
+    logic signed [8:0] c_y1_reg;
+    logic signed [9:0] c_x2_reg;
+    logic signed [8:0] c_y2_reg;
+    logic signed [9:0] c_x3_reg;
+    logic signed [8:0] c_y3_reg;
 
     // FSM Wires
     logic unsigned [7:0] circ1_vga_x;
@@ -123,6 +123,7 @@ module reuleaux(input logic clk, input logic rst_n, input logic [2:0] colour,
         else 
             c_y1 = (tmp_shifted1_2 >> M_BIT_SHIFT);
 
+        c_x2 = c_x - (s_diameter >> 1);
         c_y2 = c_y1; // Same value
 
         c_x3 = c_x;

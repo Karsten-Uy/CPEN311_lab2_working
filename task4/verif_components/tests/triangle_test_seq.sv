@@ -43,7 +43,7 @@ module triangle_test_seq (
         // dir_test3();
 
         // Randomize centres many times to catch errors
-        repeat(40) begin
+        repeat(200) begin
             random_centre();
         end
 
@@ -85,9 +85,9 @@ module triangle_test_seq (
     // -------------- RANDOMIZED CASES --------------
 
     task random_centre(bit early_clear=0);
-        vif.centre_x = $urandom_range(60, 120); 
-        vif.centre_y = $urandom_range(40, 60);
-        vif.diameter = $urandom_range(60, 100) & ~1; // force even
+        vif.centre_x = $urandom_range(0, 159); 
+        vif.centre_y = $urandom_range(0, 119);
+        vif.diameter = $urandom_range(10, 120) & ~1; // force even
         vif.start = 1'b1;
 
         $display("[%0t ns] starting random_centre with arguments:", $time);

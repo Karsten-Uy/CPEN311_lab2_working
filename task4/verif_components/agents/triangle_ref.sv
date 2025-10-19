@@ -234,16 +234,15 @@ module triangle_ref (triangle_if vif, phases phases);
 
         @(posedge vif.clk);
 
-        if (inside_x(x)) vif.vga_x = x;
-        else             vif.vga_x = 'b0;
+        if (inside_x(x) && inside_y(y)) vif.vga_x = x;
+        else                            vif.vga_x = 'b0;
 
-        if (inside_y(y)) vif.vga_y = y;
-        else             vif.vga_y = 'b0;
+        if (inside_x(x) && inside_y(y)) vif.vga_y = y;
+        else                            vif.vga_y = 'b0;
 
         if (seg_valid(x, SEGMENT_TYPE)) begin
             if (inside_x(x) && inside_y(y)) vif.vga_plot = 1'b1;
-            else vif.vga_plot = 1'b0;
-            // $display("%d,%d", vif.vga_x, vif.vga_y);
+            else                            vif.vga_plot = 1'b0;
         end
         else begin
             vif.vga_plot = 1'b0;
@@ -263,12 +262,12 @@ module triangle_ref (triangle_if vif, phases phases);
 
     function bit inside_x(int x);
         if (x >= 0 && x <= 159) return 1;
-        else                            return 0;
+        else                    return 0;
     endfunction
 
     function bit inside_y(int y);
         if (y >= 0 && y <= 119) return 1;
-        else                            return 0;
+        else                    return 0;
     endfunction
 
 endmodule

@@ -3,8 +3,8 @@ module circle#(
 ) (
      input logic clk, 
      input logic rst_n, 
-     input logic signed [8:0] centre_x,
-     input logic signed [7:0] centre_y, 
+     input logic signed [9:0] centre_x, 
+     input logic signed [8:0] centre_y,
      input logic signed [8:0] radius,
      input logic start, 
      output logic done,
@@ -34,16 +34,16 @@ module circle#(
 
      assign vga_plot = (done == 1'b0) ? dp_vga_plot : 1'b0;
 
-     assign centre_x_sgn = {1'b0, centre_x};
-     assign centre_y_sgn = {1'b0, centre_y};
-     assign radius_sgn   = {1'b0, radius};
+     // assign centre_x_sgn = {1'b0, centre_x};
+     // assign centre_y_sgn = {1'b0, centre_y};
+     // assign radius_sgn   = {1'b0, radius};
 
      datapath DP(
           .clk         (clk),
           .resetn      (rst_n),
-          .radius      (radius_sgn),
-          .centre_x    (centre_x_sgn),
-          .centre_y    (centre_y_sgn),
+          .radius      (radius),
+          .centre_x    (centre_x),
+          .centre_y    (centre_y),
 
           .octant_sel  (octant_sel),
           .dec_x       (dec_x),

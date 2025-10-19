@@ -16,8 +16,8 @@ module datapath #(
 
     // From top
     input   logic signed [8:0]    radius,
-    input   logic signed [8:0]    centre_x,
-    input   logic signed [7:0]    centre_y,
+    input   logic signed [9:0]    centre_x,
+    input   logic signed [8:0]    centre_y,
 
     // FSM signals
     input   logic unsigned [2:0]            octant_sel, // binary select mux for 0-7

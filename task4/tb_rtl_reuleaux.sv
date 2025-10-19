@@ -45,10 +45,11 @@ module tb_rtl_reuleaux();
         @(phases.run_phase==1);
 
         // Mimic time out
-        repeat(1_000_000) @(posedge dut_if.clk);
+        // repeat(1_000_000) @(posedge dut_if.clk);
+        repeat(5_000_000) @(posedge dut_if.clk);
 
-        phases.run_phase = 0;
-        phases.report_phase = 1;
+        // phases.run_phase = 0;
+        // phases.report_phase = 1;
 
         $error("Simulation Timeout!");
         ERROR_COUNT += 1;
@@ -61,7 +62,7 @@ module tb_rtl_reuleaux();
 
             ERROR_COUNT += triangle_monitor.ERROR_COUNT; // High level monitor failures
             ERROR_COUNT += test_seq.ERROR_COUNT;       // Tightly coupled test checks
-            // ERROR_COUNT += DUT.ERROR_COUNT;            // DUT design assertions
+            // ERROR_COUNT += DUT.ERROR_COUNT;            // DUT design assertfions
         
             if (ERROR_COUNT != 0) begin
                 $display("---------------------------");
