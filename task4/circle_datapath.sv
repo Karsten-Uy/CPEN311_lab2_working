@@ -3,7 +3,8 @@ module datapath #(
     parameter VGA_X_DW  = 8, 
     parameter VGA_Y_DW  = 7, 
     parameter RADIUS_DW = 8,
-    parameter CRIT_DW   = RADIUS_DW+1, // unsigned so +1 in size
+    // parameter CRIT_DW   = RADIUS_DW+1, // unsigned so +1 in size
+    parameter CRIT_DW   = 10,
 
     // Set offsets and octant such that they're X widths + 1
     parameter OCT_DW      = VGA_X_DW + 1,

@@ -31,16 +31,11 @@ module triangle_test_seq (
     task run();
         vif.forced_early_clear = 1'b0;
 
-        vif.colour = 3'b101;
 
-        // Test that multiple iterations operate properly
-        // random_centre();
-        // random_centre();
-
-        task4_test();   
+        task4_test();  
         dir_test1();
-        dir_test2();
-        dir_test3();
+
+        // repeat(5) corner_test_cases();
 
         // Randomize centres many times to catch errors
         repeat(200) begin
@@ -88,6 +83,7 @@ module triangle_test_seq (
         vif.centre_x = $urandom_range(0, 159); 
         vif.centre_y = $urandom_range(0, 119);
         vif.diameter = $urandom_range(10, 120) & ~1; // force even
+        vif.colour = $urandom_range(0, 7);
         vif.start = 1'b1;
 
         $display("[%0t ns] starting random_centre with arguments:", $time);
@@ -95,39 +91,31 @@ module triangle_test_seq (
         $display("  centre_y = %d", vif.centre_y);
         $display("  diameter = %d", vif.diameter);
 
-        repeat(20_000) @(posedge vif.clk);
-        // fork
-        //     if (early_clear) force_early_clear();
-        //     wait_done_and_deassert(); 
-        // join
-
-        vif.start = 1'b0;
-        @(posedge vif.clk);
+        wait_done_and_deassert();
     endtask
-
     
+    // -------------- DIRECTED TEST CASES --------------
+
     task task4_test(bit early_clear=0);
 
         vif.centre_x = 80;
         vif.centre_y = 60;
         vif.diameter = 80;
         vif.start = 1'b1;
+        vif.colour = 3'b101;
 
         $display("[%0t ns] starting task4_test with arguments:", $time);
         $display("  centre_x = %d", vif.centre_x);
         $display("  centre_y = %d", vif.centre_y);
         $display("  diameter = %d", vif.diameter);
 
-        repeat(20_000) @(posedge vif.clk);
-        
-        vif.start = 1'b0;
-        @(posedge vif.clk);
+        wait_done_and_deassert();
     endtask
 
     task dir_test1(bit early_clear=0);
-        vif.centre_x = 112;
-        vif.centre_y = 47;
-        vif.diameter = 88;
+        vif.centre_x = 47;
+        vif.centre_y = 65;
+        vif.diameter = 50;
         vif.start = 1'b1;
 
         $display("[%0t ns] starting dir_test1 with arguments:", $time);
@@ -135,10 +123,7 @@ module triangle_test_seq (
         $display("  centre_y = %d", vif.centre_y);
         $display("  diameter = %d", vif.diameter);
 
-        repeat(20_000) @(posedge vif.clk);
-        
-        vif.start = 1'b0;
-        @(posedge vif.clk);
+        wait_done_and_deassert();
     endtask
 
     task dir_test2(bit early_clear=0);
@@ -153,10 +138,7 @@ module triangle_test_seq (
         $display("  centre_y = %d", vif.centre_y);
         $display("  diameter = %d", vif.diameter);
 
-        repeat(20_000) @(posedge vif.clk);
-        
-        vif.start = 1'b0;
-        @(posedge vif.clk);
+        wait_done_and_deassert();
     endtask
 
     task dir_test3(bit early_clear=0);
@@ -171,10 +153,24 @@ module triangle_test_seq (
         $display("  centre_y = %d", vif.centre_y);
         $display("  diameter = %d", vif.diameter);
 
-        repeat(20_000) @(posedge vif.clk);
-        
-        vif.start = 1'b0;
-        @(posedge vif.clk);
+        wait_done_and_deassert();
+    endtask
+
+    task corner_test_cases(bit early_clear=0);
+
+        $display("[%0t ns] starting corner_test_cases with arguments:", $time);
+
+        vif.centre_x = ($urandom_range(0,1) == 1) ? 0 : 159;
+        vif.centre_y = ($urandom_range(0,1) == 1) ? 0 : 119;
+        vif.diameter = $urandom_range(0,255) & ~1; // force even;
+        vif.colour = $urandom_range(0, 7);
+        vif.start = 1'b1;
+
+        $display("  centre_x = %d", vif.centre_x);
+        $display("  centre_y = %d", vif.centre_y);
+        $display("  diameter = %d", vif.diameter);
+
+        wait_done_and_deassert();
     endtask
 
 endmodule // circle_test_seq

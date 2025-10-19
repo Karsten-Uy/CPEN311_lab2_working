@@ -27,16 +27,9 @@ module circle#(
      logic signed  [7:0]  offset_y;
      logic signed  [8:0]  crit;
 
-     logic signed  [8:0]  centre_x_sgn;
-     logic signed  [7:0]  centre_y_sgn;
-     logic signed  [8:0]  radius_sgn;
      logic unsigned dp_vga_plot;
 
      assign vga_plot = (done == 1'b0) ? dp_vga_plot : 1'b0;
-
-     // assign centre_x_sgn = {1'b0, centre_x};
-     // assign centre_y_sgn = {1'b0, centre_y};
-     // assign radius_sgn   = {1'b0, radius};
 
      datapath DP(
           .clk         (clk),
