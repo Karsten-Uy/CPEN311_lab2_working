@@ -69,6 +69,8 @@ module reuleaux(input logic clk, input logic rst_n, input logic [2:0] colour,
     logic unsigned [7:0] circle_vga_x;
     logic unsigned [6:0] circle_vga_y;
     logic unsigned       circle_vga_plot;
+
+    logic signed [8:0] circle_vga_x_s;
     
     // ---------------- MAIN FSM INST ----------------
     reuleaux_fsm REULEAUX_FSM (
@@ -228,11 +230,14 @@ module reuleaux(input logic clk, input logic rst_n, input logic [2:0] colour,
     // This block sets plot to 0 when the circle is drawing outside
     // of the reuleaux triangle using the x coordinate as the indicator
     // for whether it is out of bounds
+
+    assign circle_vga_x_s = {1'b0,circle_vga_x};
+
     always_comb begin : FINAL_SCREENCHECK
         case({start1,start2,start3})
-            3'b100  : reul_vga_plot = (circle_vga_x <= c_x3_reg) ? circle_vga_plot : 1'b0;
-            3'b010  : reul_vga_plot = (circle_vga_x >= c_x3_reg) ? circle_vga_plot : 1'b0;
-            3'b001  : reul_vga_plot = (circle_vga_x <= c_x1_reg && circle_vga_x >= c_x2_reg) ? circle_vga_plot : 1'b0;
+            3'b100  : reul_vga_plot = (circle_vga_x_s <= c_x3_reg) ? circle_vga_plot : 1'b0;
+            3'b010  : reul_vga_plot = (circle_vga_x_s >= c_x3_reg) ? circle_vga_plot : 1'b0;
+            3'b001  : reul_vga_plot = (circle_vga_x_s <= c_x1_reg && circle_vga_x_s >= c_x2_reg) ? circle_vga_plot : 1'b0;
             default : reul_vga_plot = 1'b0;
         endcase
     end

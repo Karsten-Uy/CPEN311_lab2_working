@@ -40,7 +40,7 @@ module triangle_test_seq (
         task4_test();   
         dir_test1();
         dir_test2();
-        // dir_test3();
+        dir_test3();
 
         // Randomize centres many times to catch errors
         repeat(200) begin
@@ -161,9 +161,9 @@ module triangle_test_seq (
 
     task dir_test3(bit early_clear=0);
 
-        vif.centre_x = 112;
-        vif.centre_y = 47;
-        vif.diameter = 86;
+        vif.centre_x = 6;
+        vif.centre_y = 59;
+        vif.diameter = 78;
         vif.start = 1'b1;
 
         $display("[%0t ns] starting dir_test3 with arguments:", $time);
