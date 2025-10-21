@@ -136,10 +136,16 @@ module triangle_monitor (
                         $error("Mismatch in vga_x. exp=%0d, axp=%0d", ref_if.vga_x, vif.vga_x);
                         ERROR_COUNT += 1;
                     end
-
+                    
                     if (vif.vga_y != ref_if.vga_y) begin
                         Mismatch = 1;
                         $error("Mismatch in vga_y. exp=%0d, axp=%0d", ref_if.vga_x, vif.vga_y);
+                        ERROR_COUNT += 1;
+                    end
+
+                    if (vif.vga_colour != ref_if.vga_colour ) begin
+                        Mismatch = 1;
+                        $error("Mismatch in vga_colour in (x,y) = (%d,%d). exp=%0d, axp=%0d", ref_if.vga_x, ref_if.vga_y, ref_if.vga_colour, vif.vga_colour);
                         ERROR_COUNT += 1;
                     end
                 end

@@ -97,7 +97,7 @@ module triangle_test_seq (
         vif.centre_y = 60;
         vif.diameter = 80;
         vif.start = 1'b1;
-        vif.colour = 3'b101;
+        vif.colour = 3'd2; // TODO: get to correct colour
 
         $display("[%0t ns] starting task4_test with arguments:", $time);
         $display("  centre_x = %d", vif.centre_x);

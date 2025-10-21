@@ -8,6 +8,8 @@ module tb_rtl_task4();
 
     // Interfaces
     top_if dut_if();
+    triangle_if dut_triangle_if();
+    triangle_monitor triangle_monitor(.vif(dut_triangle_if), .phases(phases));
 
     // Main DUT stimulus
     top_test_seq test_seq (.vif(dut_if), .phases(phases));
@@ -36,6 +38,19 @@ module tb_rtl_task4();
         .VGA_PLOT   (dut_if.VGA_PLOT)
     );
 
+    assign dut_triangle_if.clk         = dut_if.CLOCK_50;
+    assign dut_triangle_if.rst_n       = dut_if.KEY[3];
+    assign dut_triangle_if.start       = dut_if.KEY[0];
+
+    /*
+     * NOTE: the inputs into the circle module are hardcoded so 
+     *       they are hardcoded when passed into the ref model
+     */
+    assign dut_triangle_if.diameter   = 8'd80;
+    assign dut_triangle_if.centre_x   = 8'd80;
+    assign dut_triangle_if.centre_y   = 8'd60;
+    assign dut_triangle_if.colour = 3'd2;
+
     // -------------------- RUNNING TEST AND COLLECT COVERAGE --------------------
     int ERROR_COUNT = 0;
 
@@ -43,6 +58,7 @@ module tb_rtl_task4();
         // Treat as run_phase()
         fork
             test_seq.start();
+            triangle_monitor.start();
         join
     end
 
@@ -63,7 +79,7 @@ module tb_rtl_task4();
             // // Accumulate errors from all monitors and report
             // circle_monitor.report();
 
-            // ERROR_COUNT += circle_monitor.ERROR_COUNT; // High level monitor failures
+            ERROR_COUNT += triangle_monitor.ERROR_COUNT; // High level monitor failures
             ERROR_COUNT += test_seq.ERROR_COUNT;       // Tightly coupled test checks
             // ERROR_COUNT += DUT.ERROR_COUNT;            // DUT design assertions
         
