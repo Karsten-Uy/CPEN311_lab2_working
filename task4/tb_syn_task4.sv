@@ -49,13 +49,7 @@ module tb_syn_task4();
     assign dut_triangle_if.diameter   = 8'd80;
     assign dut_triangle_if.centre_x   = 8'd80;
     assign dut_triangle_if.centre_y   = 8'd60;
-    assign dut_triangle_if.vga_colour = 3'd2;
-
-    // assign dut_triangle_if.done        = dut_if.LEDR[0];
-    // assign dut_triangle_if.vga_x       = dut_if.VGA_X;
-    // assign dut_triangle_if.vga_y       = dut_if.VGA_Y;
-    // assign dut_triangle_if.vga_colour  = dut_if.VGA_COLOUR;
-    // assign dut_triangle_if.vga_plot    = dut_if.VGA_PLOT;
+    assign dut_triangle_if.colour = 3'd2;
 
     // -------------------- RUNNING TEST AND COLLECT COVERAGE --------------------
     int ERROR_COUNT = 0;
