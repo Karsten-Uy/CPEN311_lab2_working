@@ -1,3 +1,10 @@
+/*
+ * This is the fillscreen module for task4. The difference between 
+ * this and task2 is that this module doesn't determine colour, which
+ * controlled by reuleaux_fsm instead, being set to 0 to print a black
+ * screen when this module is running 
+ */
+
 module fillscreen(input logic clk,
                   input logic rst_n,
                   input logic start,
@@ -6,7 +13,7 @@ module fillscreen(input logic clk,
                   output logic [6:0] vga_y,
                   output logic vga_plot);
 
-     // Internal Signals
+     // ---------------- INTERNAL SIGNALS ----------------
      
      logic [7:0] x_count;
      logic [6:0] y_count;
@@ -14,6 +21,8 @@ module fillscreen(input logic clk,
      logic y_en;
      logic x_rst;
      logic y_rst;
+
+     // ---------------- FSM INSTANTIATION ----------------
 
      fillscreen_fsm FSM(
           .clk         (clk),
@@ -31,6 +40,10 @@ module fillscreen(input logic clk,
           .y_rst       (y_rst)
      );
 
+     // ---------------- XY COUNTERS ----------------
+     // These counters determine the coordinates that
+     // are plotted for a given clock cycle
+     
      // X COUNTER
      always_ff @( posedge clk ) begin : X_COUNTER
           if (x_rst == 1'b1)

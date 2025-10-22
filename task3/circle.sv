@@ -3,9 +3,9 @@ module circle(input logic clk, input logic rst_n, input logic [2:0] colour,
               input logic start, output logic done,
               output logic [7:0] vga_x, output logic [6:0] vga_y,
               output logic [2:0] vga_colour, output logic vga_plot);
-     // draw the circle
 
-     // FSM Signals
+    // ---------------- INTERNAL SIGNALS ----------------
+
      logic unsigned       fill_start;
      logic unsigned       fill_done;
      logic unsigned       draw_circle;
@@ -21,14 +21,19 @@ module circle(input logic clk, input logic rst_n, input logic [2:0] colour,
      logic signed  [8:0]  offset_x;
      logic signed  [7:0]  offset_y;
      logic signed  [8:0]  crit;
-
      logic signed  [8:0]  centre_x_sgn;
      logic signed  [7:0]  centre_y_sgn;
      logic signed  [8:0]  radius_sgn;
 
+    // ---------------- SIGN EXTENSION OF INPUTS ----------------
+    // The inputs are sign-extended to make arithmathic consistent
+    // with the crit value which can be negative
+
      assign centre_x_sgn = {1'b0, centre_x};
      assign centre_y_sgn = {1'b0, centre_y};
      assign radius_sgn   = {1'b0, radius};
+
+     // ---------------- DP INSTATIATION ----------------
 
      datapath DP(
           .clk         (clk),
@@ -57,6 +62,8 @@ module circle(input logic clk, input logic rst_n, input logic [2:0] colour,
           .vga_y       (vga_y),
           .plot        (vga_plot)
      );
+
+     // ---------------- FSM INSTATIATION ----------------
 
      circle_fsm CIRCLE_FSM(
           .clk         (clk),

@@ -1,3 +1,8 @@
+
+/*
+ * This is the FSM for the fillscreen module
+ */ 
+
 module statemachine(input logic clk, 
                     input logic rst_n,
                     input logic start, 
@@ -14,16 +19,23 @@ module statemachine(input logic clk,
                     output logic y_rst);
 
     // ---------------- PACKAGE IMPORTS ----------------
+
     import lab_pkg::*;
 
     // ---------------- STATE VARIABLES ----------------
+
     e_FSM_state state, next;
 
     // ---------------- MAIN FSM PROCESS ----------------
+    
     always_ff @(posedge clk) begin : PRESENT_STATE_LOGIC
         if (rst_n == 0)  state <= IDLE;
         else             state <= next;
     end // PRESENT_STATE_LOGIC
+
+    // ---------------- FSM NEXT STATE LOGIC ----------------
+    // The FSM controls the vga signals directly, with the only 
+    // thing needed outside of the FSM are counters
 
     always_comb begin : NEXT_STATE_LOGIC
         case (state) 
@@ -34,7 +46,11 @@ module statemachine(input logic clk,
         endcase
     end // NEXT_STATE_LOGIC
 
-    // Implementation of Mealy FSM where outputs depend on current state + inputs
+    // ---------------- FSM STATE OUTPUTS ----------------
+    // Implementation of Mealy FSM where outputs depend on 
+    // current state + counter input values and they directly
+    // control the counters and output VGA plot signals
+
     always_comb begin : CURR_STATE_OUTPUT_LOGIC
 
         // Default value assignment here before case statement

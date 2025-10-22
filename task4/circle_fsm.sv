@@ -1,3 +1,9 @@
+/* 
+ * This is the Circle FSM for the Reuleaux block. It differs from the FSM
+ * in task3 by having 3 modes, dictated by the SEGMENT_TYPE parameter which
+ * determine which octants to draw, ensuring that it will only draw in octants
+ * that conatian pixels that are actually part of the Reuleaux Triangle.
+ */
 
 module circle_fsm#(
     parameter SEGMENT_TYPE = 1 // blue(c1) = 1, green(c2) = 2, red(c3) = 3
@@ -27,18 +33,25 @@ module circle_fsm#(
     output logic calc_crit
 );
     // ---------------- PACKAGE IMPORTS ----------------
+
     import lab_pkg::*;
 
     // ---------------- STATE VARIABLES ----------------
+
     circle_FSM_state state, next;
 
     // ---------------- MAIN FSM PROCESS ----------------
+
     always_ff @( posedge clk ) begin : STATE_FF
         if (rst_n == 1'd0)
             state <= CIRCLE_IDLE;
         else 
             state <= next;
     end
+
+    // ---------------- FSM NEXT STATE LOGIC ----------------
+    // The FSM essentially enables the drawing of the 2 relevant
+    // octants as specified by the segment parameter then finishes
 
     always_comb begin : NEXT_STATE_LOGIC
         case(state)
@@ -68,6 +81,10 @@ module circle_fsm#(
             default      : next = CIRCLE_IDLE;
         endcase
     end
+
+    // ---------------- FSM STATE OUTPUTS ----------------
+    // The outputs are mostly determined by the current state and 
+    // control the datapath
 
     always_comb begin : STATE_OUTPUTS
 
@@ -102,7 +119,6 @@ module circle_fsm#(
                 load_x_next = 1'd1;
                 load_y_next = 1'd1; 
             end
-
 
             // blue (c1) loop
             CIRCLE_OCT5  : begin 

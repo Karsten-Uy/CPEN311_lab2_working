@@ -76,7 +76,7 @@ module tb_rtl_task4();
 
     initial begin
         @(phases.report_phase == 1) begin
-            // // Accumulate errors from all monitors and report
+            // Accumulate errors from all monitors and report
             // circle_monitor.report();
 
             ERROR_COUNT += triangle_monitor.ERROR_COUNT; // High level monitor failures

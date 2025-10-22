@@ -28,18 +28,26 @@ module reuleaux_fsm(
 
 );
     // ---------------- PACKAGE IMPORTS ----------------
+
     import lab_pkg::*;
 
     // ---------------- STATE VARIABLES ----------------
+
     triangle_FSM_state state, next;
 
     // ---------------- MAIN FSM PROCESS ----------------
+
     always_ff @( posedge clk ) begin : STATE_FF
         if (rst_n == 1'd0)
             state <= REUL_IDLE;
         else 
             state <= next;
     end
+
+    // ---------------- FSM NEXT STATE LOGIC ----------------
+    // The FSM controls which module to run, whether it is fillscreen,
+    // or specific circle modules that draw specific octants, moving
+    // to the next drawing module once one is completed
 
     always_comb begin : NEXT_STATE_LOGIC
         case(state)
@@ -53,6 +61,13 @@ module reuleaux_fsm(
         endcase
     end
 
+    // ---------------- FSM STATE OUTPUTS ----------------
+    // For each of the drawing states, this FSM outputs select
+    // the colour, and controls which drawing module to run. In
+    // REUL_BLACK load_corners is enabled to do calculations
+    // and the draw_reul signal controls the MUX that selects
+    // between the fillscreen and screened circle outputs
+    
     always_comb begin : STATE_OUTPUTS
 
         done         = 1'b0;

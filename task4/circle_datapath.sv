@@ -43,6 +43,7 @@ module datapath #(
 );
 
     // ---------------- INTERNAL SIGNALS ----------------
+    
     logic unsigned [VGA_X_DW-1:0] circle_x; 
     logic unsigned [VGA_Y_DW-1:0] circle_y;
     logic unsigned [VGA_X_DW-1:0] clear_x; 
@@ -74,6 +75,7 @@ module datapath #(
     logic signed  [OFFSET_Y_DW-1:0] calc_offset_y;  
 
     // ---------------- TOP LEVEL MUX ----------------
+
     assign vga_x =  circle_x;
     assign vga_y =  circle_y;
     assign plot  =  circle_plot;
@@ -112,8 +114,8 @@ module datapath #(
     end
 
     // ---------------- ALU ----------------
-
     // Implements the Bresenham Circle Algorithm for each octant x/y
+
     always_comb begin : octant_ALU 
         oct1_x = centre_x + offset_x;
         oct2_x = centre_x + offset_y;
@@ -134,8 +136,9 @@ module datapath #(
         oct7_y = centre_y - offset_x;
     end
 
-    // ---------------- octant_mux ----------------
-    // FSM cycles between oct{1...8} draw phases
+    // ---------------- OCTANT MUX ----------------
+    // Controlled by FSM and cycles between oct{1...8} draw phases
+
     always_comb begin : octant_mux;
         case(octant_sel)
             3'd0 :   {circle_int_x, circle_int_y} = {oct1_x, oct1_y};
@@ -155,6 +158,7 @@ module datapath #(
     // Set pixels offscreen to 0 as well
     // Since vga_x and vga_y are positive, signed to unsigned conversion 
     // can be done by removing MSB from circle_int_{x,y}
+
     always_comb begin : screen_check
         circle_x = (circle_int_x <= 'sd159 && circle_int_x >= 'sd0) ? circle_int_x[VGA_X_DW-1:0] : 'b0;
         circle_y = (circle_int_y <= 'sd119 && circle_int_y >= 'sd0) ? circle_int_y[VGA_Y_DW-1:0] : 'b0;

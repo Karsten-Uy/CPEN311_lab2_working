@@ -8,7 +8,7 @@ module fillscreen(input logic clk,
                   output logic [2:0] vga_colour, 
                   output logic vga_plot);
 
-     // Internal Signals
+     // ---------------- INTERNAL SIGNALS ----------------
      
      logic [7:0] x_count;
      logic [6:0] y_count;
@@ -16,6 +16,8 @@ module fillscreen(input logic clk,
      logic y_en;
      logic x_rst;
      logic y_rst;
+
+     // ---------------- FSM INSTANTIATION ----------------
 
      statemachine FSM(
           .clk         (clk),
@@ -33,6 +35,10 @@ module fillscreen(input logic clk,
           .x_rst       (x_rst),
           .y_rst       (y_rst)
      );
+
+     // ---------------- XY COUNTERS ----------------
+     // These counters determine the coordinates that
+     // are plotted for a given clock cycle
 
      // X COUNTER
      always_ff @( posedge clk ) begin : X_COUNTER

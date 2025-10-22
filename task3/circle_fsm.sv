@@ -1,3 +1,7 @@
+/* 
+ * This is the Circle FSM that controls the datapath for the circle
+ * module. 
+ */
 
 module circle_fsm(
 
@@ -31,18 +35,25 @@ module circle_fsm(
     output logic calc_crit
 );
     // ---------------- PACKAGE IMPORTS ----------------
+
     import lab_pkg::*;
 
     // ---------------- STATE VARIABLES ----------------
+
     circle_FSM_state state, next;
 
     // ---------------- MAIN FSM PROCESS ----------------
+
     always_ff @( posedge clk ) begin : STATE_FF
         if (rst_n == 1'd0)
             state <= CIRCLE_IDLE;
         else 
             state <= next;
     end
+    
+    // ---------------- FSM NEXT STATE LOGIC ----------------
+    // The FSM essentially enables the drawing of the 2 relevant
+    // octants as specified by the segment parameter then finishes
 
     always_comb begin : NEXT_STATE_LOGIC
         case(state)
@@ -61,6 +72,10 @@ module circle_fsm(
             default      : next = CIRCLE_IDLE;
         endcase
     end
+
+    // ---------------- FSM STATE OUTPUTS ----------------
+    // The outputs are mostly determined by the current state and 
+    // control the datapath
 
     always_comb begin : STATE_OUTPUTS
 
