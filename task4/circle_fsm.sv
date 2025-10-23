@@ -83,8 +83,9 @@ module circle_fsm#(
     end
 
     // ---------------- FSM STATE OUTPUTS ----------------
-    // The outputs are mostly determined by the current state and 
-    // control the datapath
+    // Implementation of Mealy FSM where outputs depend on 
+    // current state + counter input values and they control 
+    // the datapath
 
     always_comb begin : STATE_OUTPUTS
 

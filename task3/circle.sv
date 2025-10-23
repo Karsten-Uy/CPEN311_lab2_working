@@ -1,3 +1,8 @@
+/* 
+ * This is the top level module of circle, it instatiates the datapath
+ * and FSM
+ */
+
 module circle(input logic clk, input logic rst_n, input logic [2:0] colour,
               input logic [7:0] centre_x, input logic [6:0] centre_y, input logic [7:0] radius,
               input logic start, output logic done,

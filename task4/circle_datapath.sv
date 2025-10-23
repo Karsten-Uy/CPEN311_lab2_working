@@ -1,3 +1,9 @@
+/* 
+ * This is the datapath that is conterolled by the Circle FSM. The main
+ * difference between this and task3 is that it doesn't have the 
+ * fillscreen module and has +1 bit widths for calculation registers
+ * to allow for more extreme reuleaux triangles
+ */
 
 module datapath #(
     parameter VGA_X_DW  = 8, 
@@ -74,13 +80,13 @@ module datapath #(
     logic signed  [OFFSET_X_DW-1:0] calc_offset_x;  
     logic signed  [OFFSET_Y_DW-1:0] calc_offset_y;  
 
-    // ---------------- TOP LEVEL MUX ----------------
-
     assign vga_x =  circle_x;
     assign vga_y =  circle_y;
     assign plot  =  circle_plot;
 
     // ---------------- OFFSET/CRIT REGISTERS ----------------
+    // These registers keep track of the variables needed to 
+    // run the Bresenham Circle Algorithm
 
     always_ff @( posedge clk ) begin : REG__offset_x 
         if(!resetn)           offset_x <= 'sd0;
@@ -114,7 +120,8 @@ module datapath #(
     end
 
     // ---------------- ALU ----------------
-    // Implements the Bresenham Circle Algorithm for each octant x/y
+    // Implements the Bresenham Circle Algorithm calculations
+    // for each octant x/y
 
     always_comb begin : octant_ALU 
         oct1_x = centre_x + offset_x;

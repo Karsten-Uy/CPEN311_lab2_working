@@ -1,3 +1,10 @@
+/*
+ * This is the main Reuleaux module. It instatiates a FSM controller with
+ * a datapath that denables VGA plot signals to draw a Reuleaux triagle
+ * by first setting the entire screen to black with fillscreen then using
+ * 3 partial circle modules to draw the triangle.
+ */ 
+
 module reuleaux(input logic clk, input logic rst_n, input logic [2:0] colour,
                 input logic [7:0] centre_x, input logic [6:0] centre_y, input logic [7:0] diameter,
                 input logic start, output logic done,
@@ -73,6 +80,9 @@ module reuleaux(input logic clk, input logic rst_n, input logic [2:0] colour,
     logic signed [8:0] circle_vga_x_s;
     
     // ---------------- MAIN FSM INST ----------------
+    // This FSM is the controller of the caclualtion and
+    // drawing modules
+
     reuleaux_fsm REULEAUX_FSM (
         .clk          (clk),
         .rst_n        (rst_n),
@@ -93,6 +103,9 @@ module reuleaux(input logic clk, input logic rst_n, input logic [2:0] colour,
     );
     
     // ---------------- FILL_SCREEN INST ----------------
+    // Module to reset the screen to black, iterates through
+    // all the pixels and enables the plot signal
+
     fillscreen U_FILLSCREEN (
         .clk           (clk),
         .rst_n         (rst_n),
@@ -103,12 +116,29 @@ module reuleaux(input logic clk, input logic rst_n, input logic [2:0] colour,
         .vga_plot      (fillscreen_plot)
     );
 
-    // Fillscreen-Reualueaux Triangle Mux
+    // ---------------- TOP LEVEL MUX ----------------
+    // Controls whether the fillscreen or the circles are currently drawing
+
     assign vga_x    = (draw_reul == 1'b1) ? circle_vga_x  : clear_x;
     assign vga_y    = (draw_reul == 1'b1) ? circle_vga_y  : clear_y;
     assign vga_plot = (draw_reul == 1'b1) ? reul_vga_plot : fillscreen_plot;
 
     // ---------------- CORNER CALCULATIONS ----------------
+    // This module implements the below calculations in a sysnthesizable manner
+    // through bit shifts for division and real number multiplication by left bit-shifting
+    // the diameter by M_BIT_SHIFT and then multiplying it by the real number value 
+    // constant left bit-shifted by M_BIT_SHIFT with a pre determined precision that is then
+    // right bit-shifted back by M_BIT_SHIFT to get the final multiplied value
+    //
+    // assign c_x = centre_x;
+    // assign c_y = centre_y;
+    // assign c_x1 = c_x + diameter/2;
+    // assign c_y1 = c_y + diameter * $sqrt(3)/6;
+    // assign c_x2 = c_x - diameter/2;
+    // assign c_y2 = c_y + diameter * $sqrt(3)/6;
+    // assign c_x3 = c_x;
+    // assign c_y3 = c_y - diameter * $sqrt(3)/3;
+
     always_comb begin : CALC_CORNERS
 
         // Sign extend, centre_x, centre_y, and diameter always greater or equal to 0
@@ -116,7 +146,7 @@ module reuleaux(input logic clk, input logic rst_n, input logic [2:0] colour,
         c_y        = {1'sb0, centre_y};
         s_diameter = {16'sb0, diameter};    
 
-        // (c_y + (diameter * SQRT_3_DIV_6)  << M_BIT_SHIFT)) >> M_BIT_SHIFT
+        // Calculate x1, y1
         c_x1 = c_x + (s_diameter >> 1);
         tmp_shifted1_1 = s_diameter * SQRT_3_DIV_6;
         tmp_shifted1_2 = (c_y << M_BIT_SHIFT) + tmp_shifted1_1;
@@ -125,9 +155,11 @@ module reuleaux(input logic clk, input logic rst_n, input logic [2:0] colour,
         else 
             c_y1 = (tmp_shifted1_2 >> M_BIT_SHIFT);
 
+        // Calculate x2, y2
         c_x2 = c_x - (s_diameter >> 1);
         c_y2 = c_y1; // Same value
 
+        // Calculate x3, y3
         c_x3 = c_x;
         tmp_shifted3_1 = s_diameter * SQRT_3_DIV_3;
         tmp_shifted3_2 = (c_y << M_BIT_SHIFT) - tmp_shifted3_1;
@@ -136,6 +168,10 @@ module reuleaux(input logic clk, input logic rst_n, input logic [2:0] colour,
         else
             c_y3 = (tmp_shifted3_2 >> M_BIT_SHIFT);
     end
+
+    // ---------------- CORNER REGISTERS ----------------
+    // This stores the calculated corner values in registers
+    // for later user
 
     always_ff @(posedge clk) begin : CORNER_REGISTERS
         if (rst_n == 1'b0) begin
@@ -158,6 +194,9 @@ module reuleaux(input logic clk, input logic rst_n, input logic [2:0] colour,
     end
 
     // ---------------- CIRCLE BLOCKS ----------------
+    // These are the 3 circle blocks that each have a different
+    // SEGMENT_TYPE so that they only draw pixels in quadrants 
+    // that can be in the Reuleaux triangle
 
     circle #(1) CIRC_1 (
         .clk      (clk),
@@ -201,6 +240,10 @@ module reuleaux(input logic clk, input logic rst_n, input logic [2:0] colour,
         .vga_plot (circ3_vga_plot)    
     );
 
+    // ---------------- CIRCLE SELECT MUX ----------------
+    // This mux selects which circle VGA outputs are being drawn
+    // out of the 3 circle modules 
+
     always_comb begin : CIRCLE_SEL_MUX
         case ({start1,start2,start3})
             3'b100  : begin
@@ -229,8 +272,11 @@ module reuleaux(input logic clk, input logic rst_n, input logic [2:0] colour,
     // ---------------- TOP LEVEL SCREEN CHECK ----------------    
     // This block sets plot to 0 when the circle is drawing outside
     // of the reuleaux triangle using the x coordinate as the indicator
-    // for whether it is out of bounds
+    // for whether it is out of bounds. Note that out of screen checking
+    // is done by the circle module and does not need to be done here
 
+    // Sign extend circle_vga_x to make the comparison to c_x3_reg, which
+    // is a signed value, valid
     assign circle_vga_x_s = {1'b0,circle_vga_x};
 
     always_comb begin : FINAL_SCREENCHECK

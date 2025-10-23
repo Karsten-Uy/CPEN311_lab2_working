@@ -7,19 +7,32 @@ module task4(input logic CLOCK_50, input logic [3:0] KEY,
              output logic [7:0] VGA_X, output logic [6:0] VGA_Y,
              output logic [2:0] VGA_COLOUR, output logic VGA_PLOT);
 
-    // NEED TO ADD THESE TO GET IT TO WORK ON DE1_SoC
+    // ---------------- INTERNAL SIGNALS ----------------
+    
     logic [9:0] VGA_R_10;
     logic [9:0] VGA_G_10;
     logic [9:0] VGA_B_10;
     logic VGA_BLANK, VGA_SYNC;
-    assign VGA_R = VGA_R_10[9:2];
-    assign VGA_G = VGA_G_10[9:2];
-    assign VGA_B = VGA_B_10[9:2];
 
     logic [7:0] vga_x;
     logic [6:0] vga_y;
     logic [2:0] vga_colour;
     logic vga_plot;
+
+    // ---------------- SIGNAL ASSIGNMENTS ----------------
+
+    // VGA Colour Assignments
+    assign VGA_R = VGA_R_10[9:2];
+    assign VGA_G = VGA_G_10[9:2];
+    assign VGA_B = VGA_B_10[9:2];
+
+    // Monitoring Outputs
+    assign VGA_X      = vga_x;
+    assign VGA_Y      = vga_y;
+    assign VGA_COLOUR = vga_colour;
+    assign VGA_PLOT   = vga_plot;
+
+    // ---------------- REULEAUX INSTANTIATION ----------------
 
     reuleaux REULEAUX (
         .clk        (CLOCK_50),
@@ -36,11 +49,7 @@ module task4(input logic CLOCK_50, input logic [3:0] KEY,
         .vga_plot   (vga_plot)
     );
 
-    // Internal Outputs
-    assign VGA_X      = vga_x;
-    assign VGA_Y      = vga_y;
-    assign VGA_COLOUR = vga_colour;
-    assign VGA_PLOT   = vga_plot;
+    // ---------------- VGA ADAPTER INSTANTIATION ----------------
 
     vga_adapter#(        
         .RESOLUTION("160x120")) vga_u0(

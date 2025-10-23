@@ -1,3 +1,9 @@
+/* 
+ * This is the datapath that is conterolled by the Circle FSM. Its 
+ * main task to to keep track of the variables to perform the 
+ * Bresenham Circle Algorithm as well as validate and send the VGA
+ * plot signals
+ */
 
 module datapath #(
     parameter VGA_X_DW  = 8, 
@@ -75,12 +81,15 @@ module datapath #(
     logic signed  [OFFSET_Y_DW-1:0] calc_offset_y;  
 
     // ---------------- TOP LEVEL MUX ----------------
+    // Controls whether the fillscreen or the circle is currently drawing
 
     assign vga_x = (draw_circle) ? circle_x   : clear_x;
     assign vga_y = (draw_circle) ? circle_y   : clear_y;
     assign plot  = (draw_circle) ? circle_plot: fillscreen_plot;
 
     // ---------------- OFFSET/CRIT REGISTERS ----------------
+    // These registers keep track of the variables needed to 
+    // run the Bresenham Circle Algorithm
 
     always_ff @( posedge clk ) begin : REG__offset_x 
         if(!resetn)           offset_x <= 'sd0;
@@ -114,7 +123,8 @@ module datapath #(
     end
 
     // ---------------- ALU ----------------
-    // Implements the Bresenham Circle Algorithm for each octant x/y
+    // Implements the Bresenham Circle Algorithm calculations
+    // for each octant x/y
 
     always_comb begin : octant_ALU 
         oct1_x = centre_x + offset_x;
@@ -136,7 +146,7 @@ module datapath #(
         oct7_y = centre_y - offset_x;
     end
 
-    // ---------------- octant_mux ----------------
+    // ---------------- OCTANT MUX ----------------
     // Controlled by FSM and cycles between oct{1...8} draw phases
 
     always_comb begin : octant_mux;
@@ -168,6 +178,9 @@ module datapath #(
     end
 
     // ---------------- FILL_SCREEN INST ----------------
+    // Module to reset the screen to black, iterates through
+    // all the pixels and enables the plot signal
+
     fillscreen u_fillscreen (
         .clk           (clk),
         .rst_n         (resetn),

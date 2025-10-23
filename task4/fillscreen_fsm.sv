@@ -1,3 +1,7 @@
+/*
+ * This is the FSM for the fillscreen module
+ */ 
+
 module fillscreen_fsm(input logic clk, 
                     input logic rst_n,
                     input logic start, 

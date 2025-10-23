@@ -9,6 +9,7 @@ c5_pin_model_dump.txt
 *.qpg
 *.qtl
 *.qpf
+*.qsf
 *.sof
 *.bak
 work/

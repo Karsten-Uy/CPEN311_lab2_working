@@ -1,3 +1,8 @@
+/*
+ * This is the top level module for task3 that instatiates the circle module
+ * and VGA adapter to print to a screen via VGA
+ */ 
+
 module task3(input logic CLOCK_50, input logic [3:0] KEY,
              input logic [9:0] SW, output logic [9:0] LEDR,
              output logic [6:0] HEX0, output logic [6:0] HEX1, output logic [6:0] HEX2,
@@ -7,21 +12,32 @@ module task3(input logic CLOCK_50, input logic [3:0] KEY,
              output logic [7:0] VGA_X, output logic [6:0] VGA_Y,
              output logic [2:0] VGA_COLOUR, output logic VGA_PLOT);
 
-    // instantiate and connect the VGA adapter and your module
+    // ---------------- INTERNAL SIGNALS ----------------
 
-    // NEED TO ADD THESE TO GET IT TO WORK ON DE1_SoC
     logic [9:0] VGA_R_10;
     logic [9:0] VGA_G_10;
     logic [9:0] VGA_B_10;
     logic VGA_BLANK, VGA_SYNC;
-    assign VGA_R = VGA_R_10[9:2];
-    assign VGA_G = VGA_G_10[9:2];
-    assign VGA_B = VGA_B_10[9:2];
 
     logic [7:0] vga_x;
     logic [6:0] vga_y;
     logic [2:0] vga_colour;
     logic vga_plot;
+
+    // ---------------- SIGNAL ASSIGNMENTS ----------------
+
+    // VGA Colour Assignments
+    assign VGA_R = VGA_R_10[9:2];
+    assign VGA_G = VGA_G_10[9:2];
+    assign VGA_B = VGA_B_10[9:2];
+
+    // Monitoring Outputs
+    assign VGA_X      = vga_x;
+    assign VGA_Y      = vga_y;
+    assign VGA_COLOUR = vga_colour;
+    assign VGA_PLOT   = vga_plot;
+
+    // ---------------- CIRCLE INSTANTIATION ----------------
 
     circle CIRCLE(
         .clk        (CLOCK_50),
@@ -38,11 +54,7 @@ module task3(input logic CLOCK_50, input logic [3:0] KEY,
         .vga_plot   (vga_plot)
     );
 
-    // Internal Outputs
-    assign VGA_X      = vga_x;
-    assign VGA_Y      = vga_y;
-    assign VGA_COLOUR = vga_colour;
-    assign VGA_PLOT   = vga_plot;
+    // ---------------- VGA ADAPTER INSTANTIATION ----------------
 
     vga_adapter#(        
         .RESOLUTION("160x120")) vga_u0(
@@ -56,6 +68,5 @@ module task3(input logic CLOCK_50, input logic [3:0] KEY,
         .VGA_G(VGA_G_10), 
         .VGA_B(VGA_B_10),
         .*);
-
 
 endmodule: task3
