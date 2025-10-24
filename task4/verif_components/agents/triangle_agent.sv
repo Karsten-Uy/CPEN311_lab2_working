@@ -296,7 +296,7 @@ module triangle_monitor (
             radius_type = get_radius_type(test_item_arr[i].diameter);
             centre_type = get_centre_type(x, y);
 
-            cvg_sample = $sformatf("%s - %s", radius_type.name(), centre_type.name());
+            cvg_sample = $sformatf("%s - %s", centre_type.name(), radius_type.name());
 
             cvg_grp[cvg_sample] = 1'b1;
         end

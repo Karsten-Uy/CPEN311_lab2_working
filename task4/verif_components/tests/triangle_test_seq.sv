@@ -33,13 +33,13 @@ module triangle_test_seq (
         vif.forced_early_clear = 1'b0;
         task4_test();  
 
-        repeat(5) zero_test();
+        repeat(10) zero_test();
 
         // corner_test_cases();
-        repeat(5) corner_test_cases();
+        repeat(30) corner_test_cases();
 
         // Randomize centres many times to catch errors
-        repeat(10) begin
+        repeat(100) begin
             random_centre();
         end
 
@@ -75,8 +75,8 @@ module triangle_test_seq (
     // -------------- RANDOMIZED CASES --------------
 
     task random_centre(bit early_clear=0);
-        vif.centre_x = $urandom_range(0, 159); 
-        vif.centre_y = $urandom_range(0, 119);
+        vif.centre_x = $urandom_range(0, 255); 
+        vif.centre_y = $urandom_range(0, 127);
         vif.diameter = $urandom_range(0,255) & ~1; // force even;
         vif.colour = $urandom_range(0, 7);
         vif.start = 1'b1;
