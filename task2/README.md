@@ -7,9 +7,10 @@ It is highly recommended that you each work individually on this specific task. 
 
 ## Contributions made by kuy02
 - co-designed fillscreen module level
-- 
+- made fillscreen, statemachine, and task2 modules
+- tested on FPGA board
+- made testbench, monitors, and test sequences for top level and fillscreen modules
 
 ## Contributions made by [George put ur CWL here]
 - co-designed fillscreen module level
-
-## RUN COMMANDS
+- created TB templates

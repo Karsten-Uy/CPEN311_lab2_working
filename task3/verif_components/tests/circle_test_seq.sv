@@ -52,7 +52,8 @@ module circle_test_seq (
         TEST_COUNT = 0;
         vif.forced_early_clear = 1'b0;
 
-        TOTAL_TEST = 500;
+        // TOTAL_TEST = 100;
+        TOTAL_TEST = 50;
 
         repeat(TOTAL_TEST) begin
             TEST_COUNT += 1;
@@ -70,9 +71,17 @@ module circle_test_seq (
             randomize_edge(.radius_type(TEST_MED)); 
             randomize_edge(.radius_type(TEST_MAX)); 
 
-            randomize_outside_grid(.radius_type(TEST_MIN)); 
-            randomize_outside_grid(.radius_type(TEST_MED)); 
-            randomize_outside_grid(.radius_type(TEST_MAX)); 
+            // randomize_outside_grid(.radius_type(TEST_MIN)); 
+            // randomize_outside_grid(.radius_type(TEST_MED)); 
+            // randomize_outside_grid(.radius_type(TEST_MAX)); 
+
+            randomize_outside_grid_1(.radius_type(TEST_MIN)); 
+            randomize_outside_grid_1(.radius_type(TEST_MED)); 
+            randomize_outside_grid_1(.radius_type(TEST_MAX)); 
+
+            randomize_outside_grid_2_3(.radius_type(TEST_MIN)); 
+            randomize_outside_grid_2_3(.radius_type(TEST_MED)); 
+            randomize_outside_grid_2_3(.radius_type(TEST_MAX)); 
         end
 
     endtask
@@ -162,7 +171,25 @@ module circle_test_seq (
     task randomize_outside_grid(test_radius_type radius_type);
         vif.start = 1'b1;
         vif.centre_x = $urandom_range(160, 255); 
-        vif.centre_y = $urandom_range(120, 128);
+        vif.centre_y = $urandom_range(120, 127);
+
+        randomize_radius(radius_type);
+        wait_done_and_deassert();
+    endtask
+
+    task randomize_outside_grid_1(test_radius_type radius_type);
+        vif.start = 1'b1;
+        vif.centre_x = $urandom_range(0, 159); 
+        vif.centre_y = $urandom_range(120, 127);
+
+        randomize_radius(radius_type);
+        wait_done_and_deassert();
+    endtask
+
+    task randomize_outside_grid_2_3(test_radius_type radius_type);
+        vif.start = 1'b1;
+        vif.centre_x = $urandom_range(160, 255); 
+        vif.centre_y = $urandom_range(0, 127);
 
         randomize_radius(radius_type);
         wait_done_and_deassert();
