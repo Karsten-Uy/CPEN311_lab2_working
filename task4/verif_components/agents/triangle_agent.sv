@@ -84,6 +84,7 @@ module triangle_monitor (
     // -------------------------------------------------------
     int ERROR_COUNT;
     bit Mismatch;
+    test_item test_item_arr [int];
 
     task start();
         @(phases.run_phase == 1);
@@ -96,7 +97,8 @@ module triangle_monitor (
     task done();
     endtask
 
-    test_item test_item_arr [int];
+    // -------------------- MONITORING --------------------
+    // These tasks run concurrently to the DUT
 
     task monitor_coverage();
         test_item item;
@@ -222,14 +224,12 @@ module triangle_monitor (
         end
     endtask
 
+    // -------------------- REPORTING --------------------
+
     // Consume zero simulation time
     function void report();
-        report_error();
         report_coverage();
     endfunction 
-
-    function void report_error();
-    endfunction
 
     // Since start, done, and vga_x/y behaviour is checked cycle by cycle via the ref model
     // no point in monitoring output covreage

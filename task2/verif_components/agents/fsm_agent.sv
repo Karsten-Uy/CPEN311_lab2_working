@@ -49,11 +49,6 @@ module fsm_monitor (
         join_none
     endtask
 
-    task done();
-
-    endtask
-
-
     task monitor_error();
         ERROR_COUNT = 0;   
         fork

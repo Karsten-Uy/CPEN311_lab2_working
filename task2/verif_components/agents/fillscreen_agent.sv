@@ -12,12 +12,12 @@ interface fillscreen_if;
     
 endinterface //fillscreen_if
 
-
-
 module fillscreen_monitor (
     fillscreen_if vif,
     phases phases
 );
+
+    import lab_pkg::*;
 
     // -------------------------------------------------------
     // --------------------  COMMON TASKS --------------------
@@ -43,8 +43,8 @@ module fillscreen_monitor (
     endtask
 
     // Consume zero simulation time
-    function void report();
-        // report_screen();
+    function void report();        
+        report_coverage();
     endfunction 
 
     // -----------------------------------------------------------
@@ -52,6 +52,7 @@ module fillscreen_monitor (
     // -----------------------------------------------------------
 
     int screen_colour[string];
+    int screen_colour_total[string];
     int PIXEL_COUNT;
     int DUPLICATE_COUNT;
     int counter;
@@ -69,8 +70,9 @@ module fillscreen_monitor (
     endtask
 
     // -------------------- MONITORING --------------------
+    // These tasks run concurrently to the DUT
 
-
+    // Ensures that it is within the clock budget
     task monitor_clk_cycles();
         while (phases.run_phase) begin
             @(posedge vif.clk);            
@@ -148,6 +150,7 @@ module fillscreen_monitor (
             @(posedge vif.clk);
             if (vif.vga_plot) begin
                 key = $sformatf("%0d_%0d", int'(vif.vga_x), int'(vif.vga_y));
+                screen_colour_total[key] = vif.vga_colour;
                 if (screen_colour.exists(key)) begin
                     $warning("Duplicate pixel write at %s: prev_colour=%0d new_colour=%0d",
                              key, screen_colour[key], vif.vga_colour);
@@ -167,7 +170,7 @@ module fillscreen_monitor (
         end
     endtask
         
-    // -------------------- Reporting --------------------
+    // -------------------- REPORTING --------------------
 
     int missing;
     int colour_mismatches;
@@ -175,7 +178,7 @@ module fillscreen_monitor (
     int expected_colour;
     int seen_total;
 
-    // function void report_screen();
+    // Ensures final screen matches reference model
     task report_screen();
 
         missing = 0;
@@ -221,6 +224,47 @@ module fillscreen_monitor (
         end
 
     endtask
-    // endfunction
+    
+    // Reports test coverage
+    function void report_coverage();
+        
+        // Check to see if all pixels have been hit and all colours have been added
+
+        int x;
+        int y;
+        real pixel_coverage;
+        real color_coverage;
+        int color_map[int];
+        int curr_pixel_count;
+        int curr_color_count;
+
+        curr_pixel_count = 0;
+        curr_color_count = 0;
+
+        for (int x = 0; x < 160; x++) begin
+            for (int y = 0; y < 120; y++) begin
+                key = $sformatf("%0d_%0d", int'(x), int'(y));   
+                if (screen_colour_total.exists(key)) begin
+                    curr_pixel_count++;
+                    if (!color_map.exists(screen_colour_total[key])) begin
+                        color_map[screen_colour_total[key]] = 1;
+                        curr_color_count++;
+                    end
+                end               
+            end
+        end
+
+        // Print total coverage
+        pixel_coverage = curr_pixel_count / real'(EXP_DRAW_PIXELS);
+        color_coverage = curr_color_count / real'(EXP_DRAW_COLORS);
+
+        $display("Test Output Pixel Coverage = %0.5f%%", pixel_coverage*100);
+        $display("Test Output Color Coverage = %0.5f%%", color_coverage*100);
+        if ((pixel_coverage != 1.0) || (color_coverage != 1.0)) begin
+            ERROR_COUNT += 1;
+            $display("ERROR: Not 100%% coverage");
+        end
+
+    endfunction 
 
 endmodule // fillscreen_monitor

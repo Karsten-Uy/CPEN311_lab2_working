@@ -3,23 +3,13 @@ List of contributions made by members of the team.
 
 It is highly recommended that you each work individually on this specific task. However, only one solution needs to be pushed to GitHub.
 
-## Contributions made by ABC DEF
-- contribution 1
-- contribution 2
+*NOTE: we both did this task individually but only pushed the one made by Karsten
 
-## Contributions made by TUV XYZ
-- contribution 1
-- contribution 2
+## Contributions made by kuy02
+- co-designed fillscreen module level
+- 
+
+## Contributions made by [George put ur CWL here]
+- co-designed fillscreen module level
 
 ## RUN COMMANDS
-
-Run GLS
-```
-vsim work.tb_syn_task2 -L altera_mf_ver -L cyclonev_ver -L altera_ver -L altera_lnsim_ver
-```
-
-Run Normal
-```
-vsim work.tb_rtl_task2 -L altera_mf_ver
-```
-

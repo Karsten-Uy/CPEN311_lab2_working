@@ -1,6 +1,5 @@
 `timescale 1ns/1ns
 
-// `define VISUAL // for seeing output on fake VGA with tb_rtl_task3_visual.sv
 typedef enum {
     TEST_MIN,
     TEST_MED,
@@ -23,6 +22,9 @@ module circle_test_seq (
 
     int ERROR_COUNT;
 
+    // --------------------  RUN TASKS --------------------
+
+    // Start the tests
     task start();
         phases.reset_phase = 1;
         CLOCK_50_driver.start(.active_low(1), .freq_hz(50_000_000));
@@ -43,11 +45,14 @@ module circle_test_seq (
     int TEST_COUNT;
     int TOTAL_TEST;
 
+    // -------------------- TEST CASES --------------------
+
+    // Main test stimuli
     task run();
         TEST_COUNT = 0;
         vif.forced_early_clear = 1'b0;
 
-        TOTAL_TEST = 10;
+        TOTAL_TEST = 500;
 
         repeat(TOTAL_TEST) begin
             TEST_COUNT += 1;
@@ -74,27 +79,13 @@ module circle_test_seq (
 
     task force_early_clear();
         vif.forced_early_clear = 1'b1;
-        // Use to force DUT state to skip CLEAR_SCREEN state once it's been verified
-        `ifdef VISUAL        
-        if (DUT.CIRCLE.CIRCLE_FSM.state != CIRCLE_BLACK) begin
-            @(DUT.CIRCLE.CIRCLE_FSM.state == CIRCLE_BLACK) begin
-        `else
         if (DUT.CIRCLE_FSM.state != CIRCLE_BLACK) begin
             @(DUT.CIRCLE_FSM.state == CIRCLE_BLACK) begin
-        `endif
                 @(posedge vif.clk);
                 @(posedge vif.clk);
-                `ifdef VISUAL        
-                    force DUT.CIRCLE.CIRCLE_FSM.state = CIRCLE_OCT1;
-                `else
-                    force DUT.CIRCLE_FSM.state = CIRCLE_OCT1;
-                `endif
+                force DUT.CIRCLE_FSM.state = CIRCLE_OCT1;
                 @(posedge vif.clk);
-                `ifdef VISUAL        
-                    release DUT.CIRCLE.CIRCLE_FSM.state;
-                `else
-                    release DUT.CIRCLE_FSM.state;
-                `endif
+                release DUT.CIRCLE_FSM.state;
             end
         end
     endtask
@@ -109,13 +100,20 @@ module circle_test_seq (
 
     endtask
 
-
     // -------------- RANDOMIZED CASES --------------
-
+    // Too many inputs to simply to consider 100% as 
+    // all centre_x, centre_y, radius inputs reached. 
+    // Instead consider combinations of multiple bins
+    // - min, normal, max radius
+    // - centre inside screen
+    // - centre at edge
+    // - centre at corner
+    // - centre outside screen 
+    // The test cases here provide stimuli to provide 100% by the metrics described above
+    
     task rand_min();
         vif.radius = $urandom_range(0, 30);
     endtask
-
 
     task rand_med();
         vif.radius = $urandom_range(30, 100);

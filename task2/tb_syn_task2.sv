@@ -12,8 +12,7 @@ module tb_syn_task2();
 
     // Interfaces
     top_if           dut_if();    
-    fillscreen_if    dut_fillscreen_if();             
-
+    fillscreen_if    dut_fillscreen_if(); 
 
     // Main DUT stimulus
     top_test_seq       test_seq (.vif(dut_if), .phases(phases));

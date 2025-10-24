@@ -36,8 +36,6 @@ module tb_rtl_circle();
     // -------------------- RUNNING TEST AND COLLECT COVERAGE --------------------
     int ERROR_COUNT = 0;
 
-
-
     initial begin
         // Treat as run_phase()
         fork
@@ -49,9 +47,7 @@ module tb_rtl_circle();
     initial begin
         @(phases.run_phase==1);
 
-        // repeat(1_000_000) @(posedge dut_if.clk);
-        repeat(2_000_000) @(posedge dut_if.clk);
-        // repeat(200) @(posedge dut_if.clk);
+        repeat(1_000_000_000) @(posedge dut_if.clk);
 
         phases.run_phase = 0;
         phases.report_phase = 1;
@@ -67,7 +63,7 @@ module tb_rtl_circle();
 
             ERROR_COUNT += circle_monitor.ERROR_COUNT; // High level monitor failures
             ERROR_COUNT += test_seq.ERROR_COUNT;       // Tightly coupled test checks
-            // ERROR_COUNT += DUT.ERROR_COUNT;            // DUT design assertions
+            // ERROR_COUNT += DUT.ERROR_COUNT;         // DUT design assertions
         
             if (ERROR_COUNT != 0) begin
                 $display("---------------------------");

@@ -23,9 +23,7 @@ module circle_ref (circle_if vif, phases phases);
 
     circle_ref_state ref_state;
 
-
-    // Monitor start signals
-
+    // Start reference model
     task run();
         event start_trig;
 
@@ -61,6 +59,8 @@ module circle_ref (circle_if vif, phases phases);
     int centre_x;
     int centre_y;
     int crit;
+
+    // Main reference model code
     task ref_main();
         int ERROR_COUNT; // Design assertions
 
@@ -132,6 +132,7 @@ module circle_ref (circle_if vif, phases phases);
         ref_state = REF_DONE;
     endtask
 
+    // Set a pixel tobe drawn by ref model during circle drawing stage
     task setPixel(int vga_x, int vga_y, int oct);
         @(posedge vif.clk) begin
             setOct(oct);
@@ -151,9 +152,9 @@ module circle_ref (circle_if vif, phases phases);
 
         end
         @(negedge vif.clk);
-        // $display("[ref_model] x=%0d,y=%0d", vif.vga_x, vif.vga_y);
     endtask
 
+    // Mapping function that sets the vif.ref_state
     task setOct(int oct);
         case(oct)
             1: vif.ref_state = CIRCLE_OCT1;

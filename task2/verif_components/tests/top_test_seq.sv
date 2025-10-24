@@ -28,14 +28,6 @@ module top_test_seq (
     endtask // start
 
     task run();
-
-        // vif.KEY[0]  = 1'b1;
-
-        // repeat(19210)
-        //     @(posedge vif.CLOCK_50);
-
-
-        // TODO: Figure out how to make it run multiple times
         
         repeat(3) begin
 
@@ -47,10 +39,7 @@ module top_test_seq (
             vif.KEY[0]  = 1'b0;
             @(posedge vif.CLOCK_50);
 
-            // clk_driver.rst_start(.active_low(1));
-
         end
-
             
     endtask
 

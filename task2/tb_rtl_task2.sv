@@ -19,10 +19,10 @@ module tb_rtl_task2();
 
     // Test checking and coverage
     fillscreen_monitor monitor(.vif(dut_fillscreen_if), .phases(phases));
-       /* 
-        * because we can assign the outputs of fillscreen to outputs of task2, we do NOT need a seperate monitor 
-        * and can just connect it to the fillscreen monitor  
-        */
+    /* 
+     * because we can assign the outputs of fillscreen to outputs of task2, we do NOT need a seperate monitor 
+     * and can just connect it to the fillscreen monitor  
+     */
     fsm_monitor        fsm_monitor(.vif(dut_fsm_if), .phases(phases));
 
     // --------------------  DUT INSTANTIATION --------------------
@@ -103,6 +103,7 @@ module tb_rtl_task2();
         @(TEST_DONE) begin
             // Accumulate errors from all monitors and report
             monitor.report();
+            fsm_monitor.report();
 
             ERROR_COUNT += monitor.ERROR_COUNT;
         

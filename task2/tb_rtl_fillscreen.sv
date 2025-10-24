@@ -78,6 +78,7 @@ module tb_rtl_fillscreen();
         @(TEST_DONE) begin
             // Accumulate errors from all monitors and report
             monitor.report();
+            fsm_monitor.report();
 
             ERROR_COUNT += monitor.ERROR_COUNT;
         

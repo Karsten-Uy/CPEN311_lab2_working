@@ -1,4 +1,8 @@
 package lab_pkg;
+
+    parameter EXP_DRAW_PIXELS = 160*120; 
+    parameter EXP_DRAW_COLORS = 8; 
+    
     // Aim for binary coded since stated doesn't matter
     `define FSM_SWIDTH 2
   
@@ -8,7 +12,6 @@ package lab_pkg;
         DONE         // assert the done signal
     } e_FSM_state;
 
-    // synthesis translate_off
     typedef bit allowed_states      [string];
     typedef bit allowed_transitions [string];
 

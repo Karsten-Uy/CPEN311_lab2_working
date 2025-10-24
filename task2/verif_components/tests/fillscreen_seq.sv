@@ -15,6 +15,9 @@ module fillscreen_test_seq (
     assign vif.clk        = clk_if.clk;
     assign vif.rst_n      = clk_if.rst;
 
+    // --------------------  RUN TASKS --------------------
+
+    // Start the tests
     task start();
         phases.reset_phase = 1;
         clk_driver.start(.active_low(1), .freq_hz(50_000_000));
@@ -27,6 +30,7 @@ module fillscreen_test_seq (
         phases.report_phase = 1;
     endtask // start
 
+    // Main test stimuli
     task run();
 
         repeat(3) begin

@@ -39,16 +39,12 @@ module top_test_seq (
          *       we cannot add much external stimuli beyond resets
          */
 
-        vif.KEY[0] = 1'b1;        
-        wait_done_and_deassert(); 
-        
-        // // Ensure resets work
-        // repeat(2) begin
-        //     vif.KEY[0] = 1'b1;  
-        //     repeat($urandom_range(0,20_000)) @(posedge vif.CLOCK_50);
-        //     vif.KEY[0] = 1'b0;
-        //     CLOCK_50_driver.rst_start(.active_low(1));
-        // end
+        repeat(3) begin
+
+            vif.KEY[0] = 1'b1;        
+            wait_done_and_deassert(); 
+
+        end
 
     endtask
     

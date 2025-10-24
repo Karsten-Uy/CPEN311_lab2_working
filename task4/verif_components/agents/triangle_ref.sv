@@ -40,7 +40,7 @@ module triangle_ref (triangle_if vif, phases phases);
     int c_y2;
     int c_y3;
 
-    // Monitor start signals
+    // Start reference model
     task run();
         event start_trig;
 
@@ -70,6 +70,7 @@ module triangle_ref (triangle_if vif, phases phases);
         end
     endtask
 
+    // Main reference model code
     task ref_main();
 
         @(posedge vif.clk); // Load state
@@ -115,6 +116,7 @@ module triangle_ref (triangle_if vif, phases phases);
 
     endtask
 
+    // Fillscreen module ref
     task fillscreen();
         $display("[%0t ns][ref_model] Running clear screen", $time);
         ref_state = triangle_ref_pkg::CLEAR;
@@ -140,8 +142,9 @@ module triangle_ref (triangle_if vif, phases phases);
         join
     endtask
 
+    // Draws a partial circle that only contains what can be in the reuleaux triangle, the
+    // octants drawn is determined by SEGMENT_TYPE
     task draw_circle_segment(int radius, int centre_x, int centre_y, e_segment_type SEGMENT_TYPE);
-
 
         int offset_x;
         int offset_y;
@@ -257,6 +260,8 @@ module triangle_ref (triangle_if vif, phases phases);
 
         @(negedge vif.clk);
     endtask
+
+    // --------------- VALIDATION FUNCTIONS --------------
 
     function bit seg_valid(int x, e_segment_type SEGMENT_TYPE);
         case (SEGMENT_TYPE)
