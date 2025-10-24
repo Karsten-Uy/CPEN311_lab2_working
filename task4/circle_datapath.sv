@@ -9,14 +9,14 @@ module datapath #(
     parameter VGA_X_DW  = 8, 
     parameter VGA_Y_DW  = 7, 
     parameter RADIUS_DW = 8,
-    parameter CRIT_DW   = RADIUS_DW + 2, // unsigned so +1 in size + 1 more for extreme cases
+    parameter CRIT_DW   = RADIUS_DW + 3, // unsigned so +1 in size + 1 more for extreme cases
 
     // Set octant such that they're X widths + 1
     parameter OCT_DW      = VGA_X_DW + 1,
 
     // Set offsets X widths + 1 for signedness and +1 for extreme cases
     parameter OFFSET_X_DW = VGA_X_DW + 2,
-    parameter OFFSET_Y_DW = VGA_Y_DW + 2
+    parameter OFFSET_Y_DW = VGA_Y_DW + 3
 
 )(
     // Global clk and active-low reset

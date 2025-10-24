@@ -24,8 +24,8 @@ module circle(input logic clk, input logic rst_n, input logic [2:0] colour,
      logic unsigned       load_y_next;
      logic unsigned       load_crit;
      logic signed  [8:0]  offset_x;
-     logic signed  [7:0]  offset_y;
-     logic signed  [8:0]  crit;
+     logic signed  [8:0]  offset_y;
+     logic signed  [10:0]  crit;
      logic signed  [8:0]  centre_x_sgn;
      logic signed  [7:0]  centre_y_sgn;
      logic signed  [8:0]  radius_sgn;

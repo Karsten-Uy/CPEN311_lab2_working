@@ -198,6 +198,7 @@ module triangle_ref (triangle_if vif, phases phases);
 
         @(posedge vif.clk); 
 
+        // Main circle segment drawing loop. Cycle by cycle check in monitor begins here
         while (offset_y <= offset_x) begin
             case(SEGMENT_TYPE)
                 GREEN: draw_green_segment(centre_x, centre_y, offset_x, offset_y, SEGMENT_TYPE);
@@ -216,6 +217,9 @@ module triangle_ref (triangle_if vif, phases phases);
         end
     endtask
 
+    // Different segments are associated with different octants. 
+    // These are the same octants that should be drawn in the DUT to speed up 
+    // how many cycles is required to draw the full releaux triangle
     task draw_green_segment(int centre_x, int centre_y, int offset_x, int offset_y, e_segment_type SEGMENT_TYPE);
         setPixel(centre_x + offset_y, centre_y - offset_x, SEGMENT_TYPE); //  -- octant 7
         setPixel(centre_x + offset_x, centre_y - offset_y, SEGMENT_TYPE); //  -- octant 8
@@ -231,6 +235,8 @@ module triangle_ref (triangle_if vif, phases phases);
         setPixel(centre_x - offset_y, centre_y + offset_x, SEGMENT_TYPE); //  -- octant 3
     endtask
 
+    // Main draw pixel task that toggles values on the reference interface
+    // Ref interface is compared cycle by cycle with the DUT interface
     task setPixel(int x, int y, e_segment_type SEGMENT_TYPE);
 
         @(posedge vif.clk);

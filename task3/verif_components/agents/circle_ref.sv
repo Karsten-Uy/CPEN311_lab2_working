@@ -51,21 +51,21 @@ module circle_ref (circle_if vif, phases phases);
                 end
             join_none
 
-            $display("[%0t ns][ref_model] Waiting start signal...", $time);
+            // $display("[%0t ns][ref_model] Waiting start signal...", $time);
             @(start_trig);
         end
     endtask
 
-
+    int offset_x;
+    int offset_y;
+    int centre_x;
+    int centre_y;
+    int crit;
     task ref_main();
         int ERROR_COUNT; // Design assertions
-        int offset_x;
-        int offset_y;
-        int centre_x;
-        int centre_y;
-        int crit;
 
         @(posedge vif.clk); // Load state
+        vif.done <= 1'b0;
         offset_y = 0;
         offset_x = vif.radius;
         crit     = 1 - vif.radius;
@@ -75,7 +75,7 @@ module circle_ref (circle_if vif, phases phases);
         @(posedge vif.clk); // Fillscreen + 1 delay
 
         // Clear Screen
-        $display("[%0t ns][ref_model] Running clear screen", $time);
+        // $display("[%0t ns][ref_model] Running clear screen", $time);
         ref_state = CLEAR;
         vif.ref_state = CIRCLE_BLACK;
         vif.vga_plot = 1'b1;
@@ -103,7 +103,7 @@ module circle_ref (circle_if vif, phases phases);
         vif.vga_x <= 'b0;
         vif.vga_y <= 'b0;
 
-        $display("[%0t ns][ref_model] Running Circle Drawing", $time);
+        // $display("[%0t ns][ref_model] Running Circle Drawing", $time);
         ref_state = DRAW_CIRCLE;
 
         while (offset_y <= offset_x) begin

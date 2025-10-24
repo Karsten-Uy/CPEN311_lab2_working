@@ -9,12 +9,11 @@ module datapath #(
     parameter VGA_X_DW  = 8, 
     parameter VGA_Y_DW  = 7, 
     parameter RADIUS_DW = 8,
-    parameter CRIT_DW   = RADIUS_DW+1, // unsigned so +1 in size
+    parameter CRIT_DW   = RADIUS_DW+3, // unsigned so +1 in size
 
     // Set offsets and octant such that they're X widths + 1
     parameter OCT_DW      = VGA_X_DW + 1,
-    parameter OFFSET_X_DW = VGA_X_DW + 1,
-    parameter OFFSET_Y_DW = VGA_Y_DW + 1
+    parameter OFFSET_DW   = VGA_X_DW + 1
 )(
     // Global clk and active-low reset
     input   logic       clk,
@@ -38,8 +37,8 @@ module datapath #(
     input   logic unsigned                  load_x_next,
     input   logic unsigned                  load_y_next,
     input   logic unsigned                  load_crit,
-    output  logic signed  [OFFSET_X_DW-1:0] offset_x,  
-    output  logic signed  [OFFSET_Y_DW-1:0] offset_y,  
+    output  logic signed  [OFFSET_DW-1:0]   offset_x,  
+    output  logic signed  [OFFSET_DW-1:0]   offset_y,  
     output  logic signed  [CRIT_DW-1    :0] crit,
 
     // To top
@@ -77,8 +76,8 @@ module datapath #(
     logic signed [OCT_DW-1:0] oct8_y;
     logic signed [OCT_DW-1:0] circle_int_y;
 
-    logic signed  [OFFSET_X_DW-1:0] calc_offset_x;  
-    logic signed  [OFFSET_Y_DW-1:0] calc_offset_y;  
+    logic signed  [OFFSET_DW-1:0] calc_offset_x;  
+    logic signed  [OFFSET_DW-1:0] calc_offset_y;  
 
     // ---------------- TOP LEVEL MUX ----------------
     // Controls whether the fillscreen or the circle is currently drawing

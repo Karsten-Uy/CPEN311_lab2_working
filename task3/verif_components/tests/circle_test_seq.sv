@@ -1,6 +1,11 @@
 `timescale 1ns/1ns
 
 // `define VISUAL // for seeing output on fake VGA with tb_rtl_task3_visual.sv
+typedef enum {
+    TEST_MIN,
+    TEST_MED,
+    TEST_MAX
+} test_radius_type;
 
 module circle_test_seq (
     circle_if vif,
@@ -35,18 +40,34 @@ module circle_test_seq (
     parameter CENTRE_Y_MAX = 2**7 - 1;
     parameter RADIUS_MAX   = 2**8 - 1;
 
+    int TEST_COUNT;
+    int TOTAL_TEST;
+
     task run();
-        // randomize_corner();
-        // randomize_edge();
-
-
+        TEST_COUNT = 0;
         vif.forced_early_clear = 1'b0;
-        repeat(10) begin
-            randomize_inside_grid();
-        end
 
-        repeat(10) begin
-            randomize_inside_grid(.early_clear(1)); 
+        TOTAL_TEST = 10;
+
+        repeat(TOTAL_TEST) begin
+            TEST_COUNT += 1;
+            $display("Test iter %0d/%0d", TEST_COUNT, TOTAL_TEST);
+
+            randomize_inside_grid(.radius_type(TEST_MIN)); 
+            randomize_inside_grid(.radius_type(TEST_MED)); 
+            randomize_inside_grid(.radius_type(TEST_MAX)); 
+
+            randomize_corner(.radius_type(TEST_MIN)); 
+            randomize_corner(.radius_type(TEST_MED)); 
+            randomize_corner(.radius_type(TEST_MAX)); 
+
+            randomize_edge(.radius_type(TEST_MIN)); 
+            randomize_edge(.radius_type(TEST_MED)); 
+            randomize_edge(.radius_type(TEST_MAX)); 
+
+            randomize_outside_grid(.radius_type(TEST_MIN)); 
+            randomize_outside_grid(.radius_type(TEST_MED)); 
+            randomize_outside_grid(.radius_type(TEST_MAX)); 
         end
 
     endtask
@@ -91,152 +112,69 @@ module circle_test_seq (
 
     // -------------- RANDOMIZED CASES --------------
 
-    task draw_extreme_circles();
-        // Test radius inputs at min anx max bounds
-        // R = 0, 1, 255
-        vif.radius   = 0;
-        vif.start    = 1'b1;
-        wait_done_and_deassert(); 
-
-        vif.radius   = 1;
-        vif.start    = 1'b1;
-        wait_done_and_deassert(); 
-
-        vif.radius   = 255;
-        vif.start    = 1'b1;
-        wait_done_and_deassert(); 
+    task rand_min();
+        vif.radius = $urandom_range(0, 30);
     endtask
 
-    task randomize_corner();
-        /*
-            Implements randomization at one corner
 
-            0---------------------------------1
-            |                                 |
-            |                                 |
-            |                                 |
-            |                                 |
-            |                                 |
-            3---------------------------------2
-        */
+    task rand_med();
+        vif.radius = $urandom_range(30, 100);
+    endtask
 
-        case ($urandom_range(0,3))
-            'd0: begin vif.centre_x = 0;   vif.centre_y = 0;   end
-            'd1: begin vif.centre_x = 159; vif.centre_y = 0;   end
-            'd2: begin vif.centre_x = 159; vif.centre_y = 119; end
-            'd3: begin vif.centre_x = 0;   vif.centre_y = 119; end
+    task rand_max();
+        vif.radius = $urandom_range(100, 255);
+    endtask
+
+    task randomize_radius(test_radius_type radius_type = 1);
+        case (radius_type)
+            TEST_MIN: rand_min();
+            TEST_MED: rand_med();
+            TEST_MAX: rand_max();
         endcase
-
-        draw_extreme_circles();
-
-        // R > 200
-        vif.radius   = $urandom_range(201, RADIUS_MAX);
-        vif.start    = 1'b1;
-        wait_done_and_deassert(); 
-
-        // Partially inside
-        vif.radius   = $urandom_range(0, 160);
-        vif.start    = 1'b1;
-        wait_done_and_deassert(); 
-
     endtask
 
-    task randomize_edge();
-        /*
-            Implements randomization along one edge
-
-             ----------------1----------------
-            |                                 |
-            |                                 |
-            0                                 2
-            |                                 |
-            |                                 |
-             ----------------3----------------
-        */
-
-        int edge_idx;
-        edge_idx = $urandom_range(0,3);
-
-        case (edge_idx)
-            'd0: begin vif.centre_x = 0;   vif.centre_y = $urandom_range(0, 119); end
-            'd1: begin vif.centre_x = $urandom_range(0, 159); vif.centre_y = 0; end
-            'd2: begin vif.centre_x = 159; vif.centre_y = $urandom_range(0, 119); end
-            'd3: begin vif.centre_x = $urandom_range(0, 159); vif.centre_y = 119; end
-        endcase
-
-        draw_extreme_circles();
-
-        if (edge_idx == 0 || edge_idx == 2) begin // left / right edges
-            vif.radius   = 59;
-            vif.start    = 1'b1;
-            wait_done_and_deassert(); 
-
-            vif.radius   = 60;
-            vif.start    = 1'b1;
-            wait_done_and_deassert(); 
-
-            vif.radius   = 61;
-            vif.start    = 1'b1;
-            wait_done_and_deassert(); 
-        end
-
-        if (edge_idx == 1 || edge_idx == 3) begin // top/bottom edges
-            vif.radius   = 79;
-            vif.start    = 1'b1;
-            wait_done_and_deassert(); 
-
-            vif.radius   = 80;
-            vif.start    = 1'b1;
-            wait_done_and_deassert(); 
-
-            vif.radius   = 81;
-            vif.start    = 1'b1;
-            wait_done_and_deassert(); 
-        end
-
-
-    endtask
-
-    task randomize_outside_grid();
-        /*
-            Randomize such that the centre is outside
-
-             ---------------------------------
-            |                                 |
-            |                                 |
-            |                                 |
-            |                                 |
-            |                                 |
-             ---------------------------------
-
-                                   c
-        */
-
-    endtask
-
-    task randomize_inside_grid(bit early_clear = 0);
-        /*
-            Randomize such that centre is inside
-
-             ---------------------------------
-            |                                 |
-            |       c                         |
-            |                                 |
-            |                                 |
-            |                                 |
-             ---------------------------------
-        */
-
-        vif.centre_x = $urandom_range(60, 120); 
-        vif.centre_y = $urandom_range(40, 60);
-        vif.colour   = $urandom_range(1, 7);
-
-        // Has potential to be partially outiside
-        // TODO: Make tigher constraints to test fully inside and partially outside
-        vif.radius = $urandom_range(90, 120);
+    task randomize_corner(test_radius_type radius_type);
         vif.start = 1'b1;
 
+        case ($urandom_range(1,4))
+            'd1: begin vif.centre_x = $urandom_range(0,5);     vif.centre_y = $urandom_range(0,5);     end
+            'd2: begin vif.centre_x = $urandom_range(155,159); vif.centre_y = $urandom_range(0,5);     end
+            'd3: begin vif.centre_x = $urandom_range(0,5);     vif.centre_y = $urandom_range(115,119); end
+            'd4: begin vif.centre_x = $urandom_range(155,159); vif.centre_y = $urandom_range(115,119); end
+        endcase
 
+        randomize_radius(radius_type);
+        wait_done_and_deassert(); 
+    endtask
+
+    task randomize_edge(test_radius_type radius_type);
+        vif.start = 1'b1;
+
+        case ($urandom_range(1,4))
+            'd1: begin vif.centre_x = $urandom_range(0, 5);     vif.centre_y = $urandom_range(5, 115);   end
+            'd2: begin vif.centre_x = $urandom_range(5, 155);   vif.centre_y = $urandom_range(0, 5);     end
+            'd3: begin vif.centre_x = $urandom_range(155, 159); vif.centre_y = $urandom_range(5, 115);   end
+            'd4: begin vif.centre_x = $urandom_range(5, 155);   vif.centre_y = $urandom_range(115, 119); end
+        endcase
+
+        randomize_radius(radius_type);
+        wait_done_and_deassert();
+    endtask
+
+    task randomize_outside_grid(test_radius_type radius_type);
+        vif.start = 1'b1;
+        vif.centre_x = $urandom_range(160, 255); 
+        vif.centre_y = $urandom_range(120, 128);
+
+        randomize_radius(radius_type);
+        wait_done_and_deassert();
+    endtask
+
+    task randomize_inside_grid(test_radius_type radius_type, bit early_clear = 0);
+        vif.start = 1'b1;
+        vif.centre_x = $urandom_range(5, 155); 
+        vif.centre_y = $urandom_range(5, 115);
+        randomize_radius(radius_type);
 
         fork
             if (early_clear) force_early_clear();

@@ -1,5 +1,6 @@
 package lab_pkg;
 
+
     ///////////////////////////////////////////////////////////
     // circle assets
 
@@ -35,6 +36,8 @@ package lab_pkg;
     } fillscreen_FSM_state;
 
     // synthesis translate_off
+    parameter EXP_DRAW_REGIONS = 6*15; // 6 diff radius * 15 screen sections
+
     typedef bit allowed_states      [string];
     typedef bit allowed_transitions [string];
 

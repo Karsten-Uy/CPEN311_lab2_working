@@ -14,9 +14,9 @@ module circle_fsm#(
     input logic start,
 
     // From Datapath
-    input logic signed [9:0] curr_crit,
+    input logic signed [10:0] curr_crit,
     input logic signed [9:0] offset_x,
-    input logic signed [8:0] offset_y,
+    input logic signed [9:0] offset_y,
     
     // To Circle
     output logic done,
@@ -67,15 +67,30 @@ module circle_fsm#(
 
             // Draw green(c2) segment loop
             CIRCLE_OCT2  : next = CIRCLE_OCT3; 
-            CIRCLE_OCT3  : next = (offset_y+'sb1 <= offset_x-'sb1) ? CIRCLE_OCT2 : CIRCLE_DONE;
+            CIRCLE_OCT3  : begin
+                            if (curr_crit > 'sb0)
+                                next = (offset_y+'sb1 <= offset_x-'sb1) ? CIRCLE_OCT2 : CIRCLE_DONE;
+                            else
+                                next = (offset_y+'sb1 <= offset_x) ? CIRCLE_OCT2 : CIRCLE_DONE;
+                            end
 
             // Draw blue(c1) segment loop
             CIRCLE_OCT5  : next = CIRCLE_OCT6;
-            CIRCLE_OCT6  : next = (offset_y+'sb1 <= offset_x-'sb1) ? CIRCLE_OCT5 : CIRCLE_DONE;
+            CIRCLE_OCT6  : begin
+                            if (curr_crit > 'sb0)
+                                next = (offset_y+'sb1 <= offset_x-'sb1) ? CIRCLE_OCT5 : CIRCLE_DONE;
+                            else
+                                next = (offset_y+'sb1 <= offset_x) ? CIRCLE_OCT5 : CIRCLE_DONE;
+                            end
 
             // Draw red(c3) segment loop
             CIRCLE_OCT7  : next = CIRCLE_OCT8;
-            CIRCLE_OCT8  : next = (offset_y+'sb1 <= offset_x-'sb1) ? CIRCLE_OCT7 : CIRCLE_DONE;
+            CIRCLE_OCT8  : begin
+                            if (curr_crit > 'sb0)
+                                next = (offset_y+'sb1 <= offset_x-'sb1) ? CIRCLE_OCT7 : CIRCLE_DONE;
+                            else
+                                next = (offset_y+'sb1 <= offset_x) ? CIRCLE_OCT7 : CIRCLE_DONE;
+                            end
 
             CIRCLE_DONE  : next = (start == 1'd1) ? CIRCLE_DONE : CIRCLE_IDLE;
             default      : next = CIRCLE_IDLE;
@@ -111,7 +126,7 @@ module circle_fsm#(
             CIRCLE_OCT2  : begin 
                 octant_sel = 3'd1;
                 inc_y = 1'd1;
-                if (curr_crit > 0)
+                if (curr_crit > 'sb0)
                     dec_x = 1'd1;
             end
             CIRCLE_OCT3  : begin 
@@ -125,7 +140,7 @@ module circle_fsm#(
             CIRCLE_OCT5  : begin 
                 octant_sel = 3'd4;
                 inc_y = 1'd1;
-                if (curr_crit > 0)
+                if (curr_crit > 'sb0)
                     dec_x = 1'd1;
             end
             CIRCLE_OCT6  : begin 
@@ -139,7 +154,7 @@ module circle_fsm#(
             CIRCLE_OCT7  : begin 
                 octant_sel = 3'd6;
                 inc_y = 1'd1;
-                if (curr_crit > 0)
+                if (curr_crit > 'sb0)
                     dec_x = 1'd1;
             end
             CIRCLE_OCT8  : begin 

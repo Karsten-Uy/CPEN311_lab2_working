@@ -12,10 +12,10 @@ module circle_fsm(
     input logic start,
 
     // From Datapath
-    input logic signed [8:0] curr_crit,
+    input logic signed [10:0] curr_crit,
     input logic fill_done,
     input logic signed [8:0] offset_x,
-    input logic signed [7:0] offset_y,
+    input logic signed [8:0] offset_y,
 
     // To Circle
     output logic done,
@@ -67,7 +67,12 @@ module circle_fsm(
             CIRCLE_OCT5  : next = CIRCLE_OCT6;
             CIRCLE_OCT6  : next = CIRCLE_OCT7;
             CIRCLE_OCT7  : next = CIRCLE_OCT8;
-            CIRCLE_OCT8  : next = (offset_y+'sb1 <= offset_x-'sb1) ? CIRCLE_OCT1 : CIRCLE_DONE;
+            CIRCLE_OCT8  : begin
+                                if (curr_crit > 'sb0)
+                                    next = (offset_y+'sb1 <= offset_x-'sb1) ? CIRCLE_OCT1 : CIRCLE_DONE;
+                                else
+                                    next = (offset_y+'sb1 <= offset_x) ? CIRCLE_OCT1 : CIRCLE_DONE;
+                            end
             CIRCLE_DONE  : next = (start == 1'd1) ? CIRCLE_DONE : CIRCLE_IDLE;
             default      : next = CIRCLE_IDLE;
         endcase
@@ -139,7 +144,7 @@ module circle_fsm(
                 vga_colour = colour;
                 octant_sel = 3'd6;
                 inc_y = 1'd1;
-                if (curr_crit > 0)
+                if (curr_crit > 'sb0)
                     dec_x = 1'd1;
             end
             CIRCLE_OCT8  : begin 

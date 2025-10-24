@@ -49,7 +49,8 @@ module tb_rtl_circle();
     initial begin
         @(phases.run_phase==1);
 
-        repeat(1_000_000) @(posedge dut_if.clk);
+        // repeat(1_000_000) @(posedge dut_if.clk);
+        repeat(2_000_000) @(posedge dut_if.clk);
         // repeat(200) @(posedge dut_if.clk);
 
         phases.run_phase = 0;
