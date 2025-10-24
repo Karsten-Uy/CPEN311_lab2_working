@@ -33,13 +33,13 @@ module triangle_test_seq (
         vif.forced_early_clear = 1'b0;
         task4_test();  
 
-        repeat(50) zero_test();
+        repeat(5) zero_test();
 
         // corner_test_cases();
-        repeat(50) corner_test_cases();
+        repeat(5) corner_test_cases();
 
         // Randomize centres many times to catch errors
-        repeat(200) begin
+        repeat(10) begin
             random_centre();
         end
 

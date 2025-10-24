@@ -15,6 +15,8 @@ package lab_pkg;
     } triangle_FSM_state;
 
     parameter M_BIT_SHIFT = 16;
+    parameter TB_EDGE_BOUND = 5;
+    parameter EXP_DRAW_REGIONS = 6*15; // 6 diff radius * 15 screen sections
     // parameter M_BIT_SHIFT = 8;
     
 
