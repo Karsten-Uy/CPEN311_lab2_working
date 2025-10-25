@@ -227,6 +227,7 @@ module circle_test_seq (
 
         vif.centre_x = $urandom_range(0,5);     
         vif.centre_y = $urandom_range(0,5);
+        vif.colour = $urandom_range(0,7);
 
         randomize_radius(radius_type);
         wait_done_and_deassert(); 
@@ -237,6 +238,7 @@ module circle_test_seq (
 
         vif.centre_x = $urandom_range(155,159);     
         vif.centre_y = $urandom_range(0,5);
+        vif.colour = $urandom_range(0,7);
 
         randomize_radius(radius_type);
         wait_done_and_deassert(); 
@@ -247,6 +249,7 @@ module circle_test_seq (
 
         vif.centre_x = $urandom_range(0,5);     
         vif.centre_y = $urandom_range(115, 119);  
+        vif.colour = $urandom_range(0,7);
 
         randomize_radius(radius_type);
         wait_done_and_deassert(); 
@@ -257,6 +260,7 @@ module circle_test_seq (
 
         vif.centre_x = $urandom_range(155,159);     
         vif.centre_y = $urandom_range(115, 119);  
+        vif.colour = $urandom_range(0,7);
 
         randomize_radius(radius_type);
         wait_done_and_deassert(); 
@@ -269,6 +273,7 @@ module circle_test_seq (
 
         vif.centre_x = $urandom_range(0, 5);
         vif.centre_y = $urandom_range(5, 115);
+        vif.colour = $urandom_range(0,7);
 
         randomize_radius(radius_type);
         wait_done_and_deassert();
@@ -279,6 +284,7 @@ module circle_test_seq (
 
         vif.centre_x = $urandom_range(5, 155);
         vif.centre_y = $urandom_range(0, 5);
+        vif.colour = $urandom_range(0,7);
 
         randomize_radius(radius_type);
         wait_done_and_deassert();
@@ -289,6 +295,7 @@ module circle_test_seq (
 
         vif.centre_x = $urandom_range(155, 159); 
         vif.centre_y = $urandom_range(5, 115);
+        vif.colour = $urandom_range(0,7);
 
         randomize_radius(radius_type);
         wait_done_and_deassert();
@@ -299,6 +306,7 @@ module circle_test_seq (
 
         vif.centre_x = $urandom_range(5, 155);   
         vif.centre_y = $urandom_range(115, 119);
+        vif.colour = $urandom_range(0,7);
 
         randomize_radius(radius_type);
         wait_done_and_deassert();
@@ -306,8 +314,10 @@ module circle_test_seq (
 
     task randomize_outside_grid(test_radius_type radius_type);
         vif.start = 1'b1;
+        
         vif.centre_x = $urandom_range(160, 255); 
         vif.centre_y = $urandom_range(120, 127);
+        vif.colour = $urandom_range(0,7);
 
         randomize_radius(radius_type);
         wait_done_and_deassert();
@@ -315,8 +325,10 @@ module circle_test_seq (
 
     task randomize_outside_grid_1(test_radius_type radius_type);
         vif.start = 1'b1;
+
         vif.centre_x = $urandom_range(0, 159); 
         vif.centre_y = $urandom_range(120, 127);
+        vif.colour = $urandom_range(0,7);
 
         randomize_radius(radius_type);
         wait_done_and_deassert();
@@ -324,8 +336,10 @@ module circle_test_seq (
 
     task randomize_outside_grid_2_3(test_radius_type radius_type);
         vif.start = 1'b1;
+
         vif.centre_x = $urandom_range(160, 255); 
         vif.centre_y = $urandom_range(0, 127);
+        vif.colour = $urandom_range(0,7);
 
         randomize_radius(radius_type);
         wait_done_and_deassert();
@@ -333,10 +347,12 @@ module circle_test_seq (
 
     task randomize_inside_grid(test_radius_type radius_type, bit early_clear = 0);
         vif.start = 1'b1;
+        
         vif.centre_x = $urandom_range(5, 155); 
         vif.centre_y = $urandom_range(5, 115);
-        randomize_radius(radius_type);
+        vif.colour = $urandom_range(0,7);
 
+        randomize_radius(radius_type);
         fork
             if (early_clear) force_early_clear();
             wait_done_and_deassert(); 

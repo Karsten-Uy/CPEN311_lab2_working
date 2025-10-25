@@ -31,6 +31,8 @@ module triangle_test_seq (
     task run();
 
         vif.forced_early_clear = 1'b0;
+
+        // Perform test for test
         task4_test();  
 
         repeat(10) zero_test();

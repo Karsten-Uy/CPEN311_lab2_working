@@ -89,6 +89,7 @@ module circle_monitor (
     int ERROR_COUNT;
     bit Mismatch;
     test_item test_item_arr [int];
+    bit colors_drawn[int];
 
     task start();
         @(phases.run_phase == 1);
@@ -187,17 +188,47 @@ module circle_monitor (
             Mismatch = 0;
 
             if((ref_model.ref_state == circle_ref_pkg::DRAW_CIRCLE) && (ref_if.ref_state != lab_pkg::CIRCLE_BLACK)) begin
-                // Checks that x, y and color match with reference model
-                if (vif.vga_x != ref_if.vga_x ) begin
+                // // Checks that x, y and color match with reference model
+                // if (vif.vga_x != ref_if.vga_x ) begin
+                //     Mismatch = 1;
+                //     $error("Mismatch in vga_x. exp=%0d, axp=%0d", ref_if.vga_x, vif.vga_x);
+                //     ERROR_COUNT += 1;
+                // end
+
+                // if (vif.vga_y != ref_if.vga_y) begin
+                //     Mismatch = 1;
+                //     $error("Mismatch in vga_y. exp=%0d, axp=%0d", ref_if.vga_x, vif.vga_y);
+                //     ERROR_COUNT += 1;
+                // end
+
+                if (vif.vga_plot != ref_if.vga_plot) begin
                     Mismatch = 1;
-                    $error("Mismatch in vga_x. exp=%0d, axp=%0d", ref_if.vga_x, vif.vga_x);
+                    $error("vga plot signals not matching");
                     ERROR_COUNT += 1;
                 end
 
-                if (vif.vga_y != ref_if.vga_y) begin
-                    Mismatch = 1;
-                    $error("Mismatch in vga_y. exp=%0d, axp=%0d", ref_if.vga_x, vif.vga_y);
-                    ERROR_COUNT += 1;
+                if (ref_if.vga_plot == 1'b1) begin
+                    if (vif.vga_x != ref_if.vga_x ) begin
+                        Mismatch = 1;
+                        $error("Mismatch in vga_x. exp=%0d, axp=%0d", ref_if.vga_x, vif.vga_x);
+                        ERROR_COUNT += 1;
+                    end
+                    
+                    if (vif.vga_y != ref_if.vga_y) begin
+                        Mismatch = 1;
+                        $error("Mismatch in vga_y. exp=%0d, axp=%0d", ref_if.vga_x, vif.vga_y);
+                        ERROR_COUNT += 1;
+                    end                    
+
+                    if (vif.vga_colour != ref_if.vga_colour ) begin
+                        Mismatch = 1;
+                        $error("Mismatch in vga_colour in (x,y) = (%d,%d). exp=%0d, axp=%0d", ref_if.vga_x, ref_if.vga_y, ref_if.vga_colour, vif.vga_colour);
+                        ERROR_COUNT += 1;
+                    end else begin
+                        if (!colors_drawn.exists(ref_if.vga_colour)) begin
+                            colors_drawn[ref_if.vga_colour] = 1'b1;
+                        end
+                    end
                 end
             end
 
@@ -274,6 +305,7 @@ module circle_monitor (
         int x;
         int y;
         real coverage;
+        real color_coverage;
 
         string cvg_sample;       
 
@@ -292,6 +324,7 @@ module circle_monitor (
 
         // Print total coverage
         coverage = cvg_grp.size() / real'(EXP_DRAW_REGIONS);
+        color_coverage = colors_drawn.size() / real'(EXP_DRAW_COLORS);
 
 
         $display("The following test bins have been hit");
@@ -299,12 +332,16 @@ module circle_monitor (
             $display(" - %s", i);
         end
 
-        if (coverage == 1.0) begin
-            $display("Reached %0d/%0d bins. Coverage=%0.5f%%", cvg_grp.size(), EXP_DRAW_REGIONS, coverage*100);
-        end else begin
+        $display("Reached %0d/%0d bins. Coverage=%0.5f%%", cvg_grp.size(), EXP_DRAW_REGIONS, coverage*100);
+        if (coverage != 1.0) begin
             ERROR_COUNT += 1;
-            $error("Reached %0d/%0d bins. Coverage=%0.5f%%", cvg_grp.size(), EXP_DRAW_REGIONS, coverage*100);
         end
+
+        $display("Reached %0d/%0d colors. Coverage=%0.5f%%", colors_drawn.size(), EXP_DRAW_COLORS, color_coverage*100);
+        if (color_coverage != 1.0) begin
+            ERROR_COUNT += 1;
+        end
+        
     endfunction
 
     function radius_type_e get_radius_type(int radius);

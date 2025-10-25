@@ -105,6 +105,7 @@ module circle_ref (circle_if vif, phases phases);
 
         // $display("[%0t ns][ref_model] Running Circle Drawing", $time);
         ref_state = DRAW_CIRCLE;
+        vif.vga_colour <= vif.colour;
 
         while (offset_y <= offset_x) begin
             setPixel(centre_x + offset_x, centre_y + offset_y, 1); //  -- octant 1
