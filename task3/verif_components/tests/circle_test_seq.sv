@@ -1,9 +1,18 @@
 `timescale 1ns/1ns
 
+// typedef enum {
+//     TEST_MIN,
+//     TEST_MED,
+//     TEST_MAX
+// } test_radius_type;
+
 typedef enum {
-    TEST_MIN,
-    TEST_MED,
-    TEST_MAX
+    MIN_0_10,
+    MIN_10_30,
+    MED_30_60,
+    MED_60_100,
+    MAX_100_200,
+    MAX_200_255
 } test_radius_type;
 
 module circle_test_seq (
@@ -53,35 +62,91 @@ module circle_test_seq (
         vif.forced_early_clear = 1'b0;
 
         // TOTAL_TEST = 100;
-        TOTAL_TEST = 50;
+        TOTAL_TEST = 5;
 
         repeat(TOTAL_TEST) begin
             TEST_COUNT += 1;
             $display("Test iter %0d/%0d", TEST_COUNT, TOTAL_TEST);
 
-            randomize_inside_grid(.radius_type(TEST_MIN)); 
-            randomize_inside_grid(.radius_type(TEST_MED)); 
-            randomize_inside_grid(.radius_type(TEST_MAX)); 
+            repeat (4) begin
+                randomize_inside_grid(.radius_type(MIN_0_10)); 
+                randomize_inside_grid(.radius_type(MIN_10_30)); 
+                randomize_inside_grid(.radius_type(MED_30_60)); 
+                randomize_inside_grid(.radius_type(MED_60_100)); 
+                randomize_inside_grid(.radius_type(MAX_100_200)); 
+                randomize_inside_grid(.radius_type(MAX_200_255)); 
+            end
 
-            randomize_corner(.radius_type(TEST_MIN)); 
-            randomize_corner(.radius_type(TEST_MED)); 
-            randomize_corner(.radius_type(TEST_MAX)); 
+            randomize_corner1(.radius_type(MIN_0_10)); 
+            randomize_corner1(.radius_type(MIN_10_30)); 
+            randomize_corner1(.radius_type(MED_30_60)); 
+            randomize_corner1(.radius_type(MED_60_100)); 
+            randomize_corner1(.radius_type(MAX_100_200)); 
+            randomize_corner1(.radius_type(MAX_200_255)); 
 
-            randomize_edge(.radius_type(TEST_MIN)); 
-            randomize_edge(.radius_type(TEST_MED)); 
-            randomize_edge(.radius_type(TEST_MAX)); 
+            randomize_corner2(.radius_type(MIN_0_10)); 
+            randomize_corner2(.radius_type(MIN_10_30)); 
+            randomize_corner2(.radius_type(MED_30_60)); 
+            randomize_corner2(.radius_type(MED_60_100)); 
+            randomize_corner2(.radius_type(MAX_100_200)); 
+            randomize_corner2(.radius_type(MAX_200_255)); 
 
-            // randomize_outside_grid(.radius_type(TEST_MIN)); 
-            // randomize_outside_grid(.radius_type(TEST_MED)); 
-            // randomize_outside_grid(.radius_type(TEST_MAX)); 
+            randomize_corner3(.radius_type(MIN_0_10)); 
+            randomize_corner3(.radius_type(MIN_10_30)); 
+            randomize_corner3(.radius_type(MED_30_60)); 
+            randomize_corner3(.radius_type(MED_60_100)); 
+            randomize_corner3(.radius_type(MAX_100_200)); 
+            randomize_corner3(.radius_type(MAX_200_255)); 
 
-            randomize_outside_grid_1(.radius_type(TEST_MIN)); 
-            randomize_outside_grid_1(.radius_type(TEST_MED)); 
-            randomize_outside_grid_1(.radius_type(TEST_MAX)); 
+            randomize_corner4(.radius_type(MIN_0_10)); 
+            randomize_corner4(.radius_type(MIN_10_30)); 
+            randomize_corner4(.radius_type(MED_30_60)); 
+            randomize_corner4(.radius_type(MED_60_100)); 
+            randomize_corner4(.radius_type(MAX_100_200)); 
+            randomize_corner4(.radius_type(MAX_200_255)); 
 
-            randomize_outside_grid_2_3(.radius_type(TEST_MIN)); 
-            randomize_outside_grid_2_3(.radius_type(TEST_MED)); 
-            randomize_outside_grid_2_3(.radius_type(TEST_MAX)); 
+            randomize_edge1(.radius_type(MIN_0_10)); 
+            randomize_edge1(.radius_type(MIN_10_30)); 
+            randomize_edge1(.radius_type(MED_30_60));
+            randomize_edge1(.radius_type(MED_60_100)); 
+            randomize_edge1(.radius_type(MAX_100_200)); 
+            randomize_edge1(.radius_type(MAX_200_255));  
+
+            randomize_edge2(.radius_type(MIN_0_10)); 
+            randomize_edge2(.radius_type(MIN_10_30)); 
+            randomize_edge2(.radius_type(MED_30_60));
+            randomize_edge2(.radius_type(MED_60_100)); 
+            randomize_edge2(.radius_type(MAX_100_200)); 
+            randomize_edge2(.radius_type(MAX_200_255)); 
+
+            randomize_edge3(.radius_type(MIN_0_10)); 
+            randomize_edge3(.radius_type(MIN_10_30)); 
+            randomize_edge3(.radius_type(MED_30_60));
+            randomize_edge3(.radius_type(MED_60_100)); 
+            randomize_edge3(.radius_type(MAX_100_200)); 
+            randomize_edge3(.radius_type(MAX_200_255)); 
+
+            randomize_edge4(.radius_type(MIN_0_10)); 
+            randomize_edge4(.radius_type(MIN_10_30)); 
+            randomize_edge4(.radius_type(MED_30_60));
+            randomize_edge4(.radius_type(MED_60_100)); 
+            randomize_edge4(.radius_type(MAX_100_200)); 
+            randomize_edge4(.radius_type(MAX_200_255)); 
+
+            randomize_outside_grid_1(.radius_type(MIN_0_10)); 
+            randomize_outside_grid_1(.radius_type(MIN_10_30)); 
+            randomize_outside_grid_1(.radius_type(MED_30_60)); 
+            randomize_outside_grid_1(.radius_type(MED_60_100)); 
+            randomize_outside_grid_1(.radius_type(MAX_100_200)); 
+            randomize_outside_grid_1(.radius_type(MAX_200_255)); 
+
+            randomize_outside_grid_2_3(.radius_type(MIN_0_10)); 
+            randomize_outside_grid_2_3(.radius_type(MIN_10_30)); 
+            randomize_outside_grid_2_3(.radius_type(MED_30_60)); 
+            randomize_outside_grid_2_3(.radius_type(MED_60_100)); 
+            randomize_outside_grid_2_3(.radius_type(MAX_100_200)); 
+            randomize_outside_grid_2_3(.radius_type(MAX_200_255)); 
+
         end
 
     endtask
@@ -120,49 +185,120 @@ module circle_test_seq (
     // - centre outside screen 
     // The test cases here provide stimuli to provide 100% by the metrics described above
     
-    task rand_min();
-        vif.radius = $urandom_range(0, 30);
+    task rand_min1();
+        vif.radius = $urandom_range(0, 10);
     endtask
 
-    task rand_med();
-        vif.radius = $urandom_range(30, 100);
+    task rand_min2();
+        vif.radius = $urandom_range(10, 30);
     endtask
 
-    task rand_max();
-        vif.radius = $urandom_range(100, 255);
+    task rand_med1();
+        vif.radius = $urandom_range(30, 60);
+    endtask
+
+    task rand_med2();
+        vif.radius = $urandom_range(60, 100);
+    endtask
+
+    task rand_max1();
+        vif.radius = $urandom_range(100, 200);
+    endtask
+
+    task rand_max2();
+        vif.radius = $urandom_range(200, 255);
     endtask
 
     task randomize_radius(test_radius_type radius_type = 1);
         case (radius_type)
-            TEST_MIN: rand_min();
-            TEST_MED: rand_med();
-            TEST_MAX: rand_max();
+            MIN_0_10    : rand_min1();
+            MIN_10_30   : rand_min2(); 
+            MED_30_60   : rand_med1();
+            MED_60_100  : rand_med2();
+            MAX_100_200 : rand_max1();
+            MAX_200_255 : rand_max2();
         endcase
     endtask
 
-    task randomize_corner(test_radius_type radius_type);
+    // Corners
+
+    task randomize_corner1(test_radius_type radius_type);
         vif.start = 1'b1;
 
-        case ($urandom_range(1,4))
-            'd1: begin vif.centre_x = $urandom_range(0,5);     vif.centre_y = $urandom_range(0,5);     end
-            'd2: begin vif.centre_x = $urandom_range(155,159); vif.centre_y = $urandom_range(0,5);     end
-            'd3: begin vif.centre_x = $urandom_range(0,5);     vif.centre_y = $urandom_range(115,119); end
-            'd4: begin vif.centre_x = $urandom_range(155,159); vif.centre_y = $urandom_range(115,119); end
-        endcase
+        vif.centre_x = $urandom_range(0,5);     
+        vif.centre_y = $urandom_range(0,5);
 
         randomize_radius(radius_type);
         wait_done_and_deassert(); 
     endtask
 
-    task randomize_edge(test_radius_type radius_type);
+    task randomize_corner2(test_radius_type radius_type);
         vif.start = 1'b1;
 
-        case ($urandom_range(1,4))
-            'd1: begin vif.centre_x = $urandom_range(0, 5);     vif.centre_y = $urandom_range(5, 115);   end
-            'd2: begin vif.centre_x = $urandom_range(5, 155);   vif.centre_y = $urandom_range(0, 5);     end
-            'd3: begin vif.centre_x = $urandom_range(155, 159); vif.centre_y = $urandom_range(5, 115);   end
-            'd4: begin vif.centre_x = $urandom_range(5, 155);   vif.centre_y = $urandom_range(115, 119); end
-        endcase
+        vif.centre_x = $urandom_range(155,159);     
+        vif.centre_y = $urandom_range(0,5);
+
+        randomize_radius(radius_type);
+        wait_done_and_deassert(); 
+    endtask
+
+    task randomize_corner3(test_radius_type radius_type);
+        vif.start = 1'b1;
+
+        vif.centre_x = $urandom_range(0,5);     
+        vif.centre_y = $urandom_range(115, 119);  
+
+        randomize_radius(radius_type);
+        wait_done_and_deassert(); 
+    endtask
+
+    task randomize_corner4(test_radius_type radius_type);
+        vif.start = 1'b1;
+
+        vif.centre_x = $urandom_range(155,159);     
+        vif.centre_y = $urandom_range(115, 119);  
+
+        randomize_radius(radius_type);
+        wait_done_and_deassert(); 
+    endtask
+
+    // Edges
+
+    task randomize_edge1(test_radius_type radius_type);
+        vif.start = 1'b1;
+
+        vif.centre_x = $urandom_range(0, 5);
+        vif.centre_y = $urandom_range(5, 115);
+
+        randomize_radius(radius_type);
+        wait_done_and_deassert();
+    endtask
+
+    task randomize_edge2(test_radius_type radius_type);
+        vif.start = 1'b1;
+
+        vif.centre_x = $urandom_range(5, 155);
+        vif.centre_y = $urandom_range(0, 5);
+
+        randomize_radius(radius_type);
+        wait_done_and_deassert();
+    endtask
+
+    task randomize_edge3(test_radius_type radius_type);
+        vif.start = 1'b1;
+
+        vif.centre_x = $urandom_range(155, 159); 
+        vif.centre_y = $urandom_range(5, 115);
+
+        randomize_radius(radius_type);
+        wait_done_and_deassert();
+    endtask
+
+    task randomize_edge4(test_radius_type radius_type);
+        vif.start = 1'b1;
+
+        vif.centre_x = $urandom_range(5, 155);   
+        vif.centre_y = $urandom_range(115, 119);
 
         randomize_radius(radius_type);
         wait_done_and_deassert();

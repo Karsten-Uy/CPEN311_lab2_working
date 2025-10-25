@@ -327,26 +327,54 @@ module circle_monitor (
     function centre_type_e get_centre_type(int x, int y);
         centre_type_e centre_type;
 
+        // if (inside_screen(x,y)) begin
+        //     // Middle portion of screen
+        //     if      ((x >= 5   && x <= 80)  && (y >= 5   && y <= 60))  centre_type = MIDDLE1;
+        //     else if ((x >= 80  && x <= 155) && (y >= 5   && y <= 60))  centre_type = MIDDLE2;
+        //     else if ((x >= 5   && x <= 80)  && (y >= 60  && y <= 115)) centre_type = MIDDLE3;
+        //     else if ((x >= 80  && x <= 155) && (y >= 60  && y <= 115)) centre_type = MIDDLE4;
+
+        //     // Edge regions 
+        //     else if ((x <= 5)   && (y >= 5   && y <= 115)) centre_type = EDGE1;
+        //     else if ((y <= 5)   && (x >= 5   && x <= 155)) centre_type = EDGE2;
+        //     else if ((x >= 155) && (y >= 5   && y <= 115)) centre_type = EDGE3;
+        //     else if ((y >= 115) && (x >= 5   && x <= 155)) centre_type = EDGE4;
+
+        //     // Corner regions 
+        //     else if ((x <= 5)   && (y <= 5))   centre_type = CORNER1;
+        //     else if ((x >= 155) && (y <= 5))   centre_type = CORNER2;
+        //     else if ((x <= 5)   && (y >= 115)) centre_type = CORNER3;
+        //     else if ((x >= 155) && (y >= 115)) centre_type = CORNER4;
+
+        //     else $fatal("Hit invalid input");            
+        // end
+        // else begin // Outside regions
+        //     if      ((x <= 160) && (y >= 120)) centre_type = OUTSIDE1;
+        //     else if ((x >= 160) && (x <= 208)) centre_type = OUTSIDE2;
+        //     else if ((x >= 208) && (x <= 255)) centre_type = OUTSIDE3;
+        //     else $fatal("Hit invalid input");
+        // end
+
         if (inside_screen(x,y)) begin
-            // Middle portion of screen
-            if      ((x >= 5   && x <= 80)  && (y >= 5   && y <= 60))  centre_type = MIDDLE1;
-            else if ((x >= 80  && x <= 155) && (y >= 5   && y <= 60))  centre_type = MIDDLE2;
-            else if ((x >= 5   && x <= 80)  && (y >= 60  && y <= 115)) centre_type = MIDDLE3;
-            else if ((x >= 80  && x <= 155) && (y >= 60  && y <= 115)) centre_type = MIDDLE4;
-
-            // Edge regions 
-            else if ((x <= 5)   && (y >= 5   && y <= 115)) centre_type = EDGE1;
-            else if ((y <= 5)   && (x >= 5   && x <= 155)) centre_type = EDGE2;
-            else if ((x >= 155) && (y >= 5   && y <= 115)) centre_type = EDGE3;
-            else if ((y >= 115) && (x >= 5   && x <= 155)) centre_type = EDGE4;
-
-            // Corner regions 
-            else if ((x <= 5)   && (y <= 5))   centre_type = CORNER1;
+            // Corners first
+            if      ((x <= 5)   && (y <= 5))   centre_type = CORNER1;
             else if ((x >= 155) && (y <= 5))   centre_type = CORNER2;
             else if ((x <= 5)   && (y >= 115)) centre_type = CORNER3;
             else if ((x >= 155) && (y >= 115)) centre_type = CORNER4;
 
-            else $fatal("Hit invalid input");            
+            // Edges next
+            else if ((x <= 5)   && (y > 5   && y < 115)) centre_type = EDGE1;
+            else if ((y <= 5)   && (x > 5   && x < 155)) centre_type = EDGE2;
+            else if ((x >= 155) && (y > 5   && y < 115)) centre_type = EDGE3;
+            else if ((y >= 115) && (x > 5   && x < 155)) centre_type = EDGE4;
+
+            // Middles last
+            else if ((x > 5   && x <= 80)  && (y > 5   && y <= 60))  centre_type = MIDDLE1;
+            else if ((x > 80  && x < 155)  && (y > 5   && y <= 60))  centre_type = MIDDLE2;
+            else if ((x > 5   && x <= 80)  && (y > 60  && y < 115))  centre_type = MIDDLE3;
+            else if ((x > 80  && x < 155)  && (y > 60  && y < 115))  centre_type = MIDDLE4;
+
+            else $fatal("Hit invalid input");
         end
         else begin // Outside regions
             if      ((x <= 160) && (y >= 120)) centre_type = OUTSIDE1;
