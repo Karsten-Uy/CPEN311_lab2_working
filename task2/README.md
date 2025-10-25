@@ -11,6 +11,6 @@ It is highly recommended that you each work individually on this specific task. 
 - tested on FPGA board
 - made testbench, monitors, and test sequences for top level and fillscreen modules
 
-## Contributions made by [George put ur CWL here]
+## Contributions made by glin05
 - co-designed fillscreen module level
 - created TB templates

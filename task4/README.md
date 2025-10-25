@@ -11,7 +11,7 @@ List of contributions made by members of the team.
 - debugged testbench
 - debugging design
 
-## Contributions made by [George put your CWL here]
+## Contributions made by glin05
 - lead high level design for circle module level
     - created python reference model and decided which circle octants to draw
 - made changes to circle module
