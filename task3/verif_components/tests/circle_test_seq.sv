@@ -1,11 +1,5 @@
 `timescale 1ns/1ns
 
-// typedef enum {
-//     TEST_MIN,
-//     TEST_MED,
-//     TEST_MAX
-// } test_radius_type;
-
 typedef enum {
     MIN_0_10,
     MIN_10_30,

@@ -90,6 +90,7 @@ module circle_monitor (
     bit Mismatch;
     test_item test_item_arr [int];
     bit colors_drawn[int];
+    bit pixels_drawn[string];
 
     task start();
         @(phases.run_phase == 1);
@@ -177,6 +178,8 @@ module circle_monitor (
         end       
 
     endtask
+
+    string key;
             
     task scoreboard();
         fork
@@ -187,19 +190,14 @@ module circle_monitor (
             @ (negedge vif.clk); // Synchonization event
             Mismatch = 0;
 
-            if((ref_model.ref_state == circle_ref_pkg::DRAW_CIRCLE) && (ref_if.ref_state != lab_pkg::CIRCLE_BLACK)) begin
-                // // Checks that x, y and color match with reference model
-                // if (vif.vga_x != ref_if.vga_x ) begin
-                //     Mismatch = 1;
-                //     $error("Mismatch in vga_x. exp=%0d, axp=%0d", ref_if.vga_x, vif.vga_x);
-                //     ERROR_COUNT += 1;
-                // end
+            if (ref_if.vga_plot == 1'b1) begin
+                key = $sformatf("%0d_%0d", int'(vif.vga_x), int'(vif.vga_y));
+                if (!pixels_drawn.exists(key)) begin
+                    pixels_drawn[key] = 1'b1;
+                end
+            end
 
-                // if (vif.vga_y != ref_if.vga_y) begin
-                //     Mismatch = 1;
-                //     $error("Mismatch in vga_y. exp=%0d, axp=%0d", ref_if.vga_x, vif.vga_y);
-                //     ERROR_COUNT += 1;
-                // end
+            if((ref_model.ref_state == circle_ref_pkg::DRAW_CIRCLE) && (ref_if.ref_state != lab_pkg::CIRCLE_BLACK)) begin
 
                 if (vif.vga_plot != ref_if.vga_plot) begin
                     Mismatch = 1;
@@ -228,7 +226,7 @@ module circle_monitor (
                         if (!colors_drawn.exists(ref_if.vga_colour)) begin
                             colors_drawn[ref_if.vga_colour] = 1'b1;
                         end
-                    end
+                    end                    
                 end
             end
 
@@ -364,54 +362,26 @@ module circle_monitor (
     function centre_type_e get_centre_type(int x, int y);
         centre_type_e centre_type;
 
-        // if (inside_screen(x,y)) begin
-        //     // Middle portion of screen
-        //     if      ((x >= 5   && x <= 80)  && (y >= 5   && y <= 60))  centre_type = MIDDLE1;
-        //     else if ((x >= 80  && x <= 155) && (y >= 5   && y <= 60))  centre_type = MIDDLE2;
-        //     else if ((x >= 5   && x <= 80)  && (y >= 60  && y <= 115)) centre_type = MIDDLE3;
-        //     else if ((x >= 80  && x <= 155) && (y >= 60  && y <= 115)) centre_type = MIDDLE4;
-
-        //     // Edge regions 
-        //     else if ((x <= 5)   && (y >= 5   && y <= 115)) centre_type = EDGE1;
-        //     else if ((y <= 5)   && (x >= 5   && x <= 155)) centre_type = EDGE2;
-        //     else if ((x >= 155) && (y >= 5   && y <= 115)) centre_type = EDGE3;
-        //     else if ((y >= 115) && (x >= 5   && x <= 155)) centre_type = EDGE4;
-
-        //     // Corner regions 
-        //     else if ((x <= 5)   && (y <= 5))   centre_type = CORNER1;
-        //     else if ((x >= 155) && (y <= 5))   centre_type = CORNER2;
-        //     else if ((x <= 5)   && (y >= 115)) centre_type = CORNER3;
-        //     else if ((x >= 155) && (y >= 115)) centre_type = CORNER4;
-
-        //     else $fatal("Hit invalid input");            
-        // end
-        // else begin // Outside regions
-        //     if      ((x <= 160) && (y >= 120)) centre_type = OUTSIDE1;
-        //     else if ((x >= 160) && (x <= 208)) centre_type = OUTSIDE2;
-        //     else if ((x >= 208) && (x <= 255)) centre_type = OUTSIDE3;
-        //     else $fatal("Hit invalid input");
-        // end
-
         if (inside_screen(x,y)) begin
-            // Corners first
-            if      ((x <= 5)   && (y <= 5))   centre_type = CORNER1;
+            // Middle portion of screen
+            if      ((x >= 5   && x <= 80)  && (y >= 5   && y <= 60))  centre_type = MIDDLE1;
+            else if ((x >= 80  && x <= 155) && (y >= 5   && y <= 60))  centre_type = MIDDLE2;
+            else if ((x >= 5   && x <= 80)  && (y >= 60  && y <= 115)) centre_type = MIDDLE3;
+            else if ((x >= 80  && x <= 155) && (y >= 60  && y <= 115)) centre_type = MIDDLE4;
+
+            // Edge regions 
+            else if ((x <= 5)   && (y >= 5   && y <= 115)) centre_type = EDGE1;
+            else if ((y <= 5)   && (x >= 5   && x <= 155)) centre_type = EDGE2;
+            else if ((x >= 155) && (y >= 5   && y <= 115)) centre_type = EDGE3;
+            else if ((y >= 115) && (x >= 5   && x <= 155)) centre_type = EDGE4;
+
+            // Corner regions 
+            else if ((x <= 5)   && (y <= 5))   centre_type = CORNER1;
             else if ((x >= 155) && (y <= 5))   centre_type = CORNER2;
             else if ((x <= 5)   && (y >= 115)) centre_type = CORNER3;
             else if ((x >= 155) && (y >= 115)) centre_type = CORNER4;
 
-            // Edges next
-            else if ((x <= 5)   && (y > 5   && y < 115)) centre_type = EDGE1;
-            else if ((y <= 5)   && (x > 5   && x < 155)) centre_type = EDGE2;
-            else if ((x >= 155) && (y > 5   && y < 115)) centre_type = EDGE3;
-            else if ((y >= 115) && (x > 5   && x < 155)) centre_type = EDGE4;
-
-            // Middles last
-            else if ((x > 5   && x <= 80)  && (y > 5   && y <= 60))  centre_type = MIDDLE1;
-            else if ((x > 80  && x < 155)  && (y > 5   && y <= 60))  centre_type = MIDDLE2;
-            else if ((x > 5   && x <= 80)  && (y > 60  && y < 115))  centre_type = MIDDLE3;
-            else if ((x > 80  && x < 155)  && (y > 60  && y < 115))  centre_type = MIDDLE4;
-
-            else $fatal("Hit invalid input");
+            else $fatal("Hit invalid input");            
         end
         else begin // Outside regions
             if      ((x <= 160) && (y >= 120)) centre_type = OUTSIDE1;
@@ -419,7 +389,7 @@ module circle_monitor (
             else if ((x >= 208) && (x <= 255)) centre_type = OUTSIDE3;
             else $fatal("Hit invalid input");
         end
-
+        
         return centre_type;
     endfunction
 
@@ -428,6 +398,26 @@ module circle_monitor (
             return 1'b1;
         else
             return 1'b0;
+    endfunction
+
+    // Top Level coverage
+    function void report_top();
+        report_coverage_top();
+    endfunction 
+
+    function void report_coverage_top();
+
+        // For top level, we just ensure that all pixels have been hit
+        real coverage;
+
+        // Print total coverage
+        coverage = pixels_drawn.size() / real'(EXP_PIXELS_DRAWN);
+
+        $display("Reached %0d/%0d pixels. Coverage=%0.5f%%", pixels_drawn.size(), EXP_PIXELS_DRAWN, coverage*100);
+        if (coverage != 1.0) begin
+            ERROR_COUNT += 1;
+        end
+        
     endfunction
 
 endmodule // circle_monitor

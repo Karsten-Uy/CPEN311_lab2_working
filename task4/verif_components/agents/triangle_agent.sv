@@ -85,6 +85,8 @@ module triangle_monitor (
     int ERROR_COUNT;
     bit Mismatch;
     test_item test_item_arr [int];
+    bit colors_drawn[int];
+    bit pixels_drawn[string];
 
     task start();
         @(phases.run_phase == 1);
@@ -173,7 +175,9 @@ module triangle_monitor (
         end       
 
     endtask
-            
+
+   string key;
+
     task scoreboard();
         fork
             ref_model.run();
@@ -182,6 +186,13 @@ module triangle_monitor (
         while(phases.run_phase==1) begin
             @ (negedge vif.clk); // Synchonization event
             Mismatch = 0;
+
+            if (vif.vga_plot == 1'b1) begin
+                key = $sformatf("%0d_%0d", int'(vif.vga_x), int'(vif.vga_y));
+                if (!pixels_drawn.exists(key)) begin
+                    pixels_drawn[key] = 1'b1;
+                end
+            end
 
             if((ref_model.ref_state == triangle_ref_pkg::DRAW_TRIANGLE) && (ref_model.ref_state != lab_pkg::REUL_BLACK)) begin
                 // Checks that x, y and color match with reference model
@@ -207,7 +218,11 @@ module triangle_monitor (
                     if (vif.vga_colour != ref_if.vga_colour ) begin
                         Mismatch = 1;
                         $error("Mismatch in vga_colour in (x,y) = (%d,%d). exp=%0d, axp=%0d", ref_if.vga_x, ref_if.vga_y, ref_if.vga_colour, vif.vga_colour);
-                        ERROR_COUNT += 1;
+                        ERROR_COUNT += 1;                        
+                    end else begin
+                        if (!colors_drawn.exists(ref_if.vga_colour)) begin
+                            colors_drawn[ref_if.vga_colour] = 1'b1;
+                        end
                     end
                 end
             end
@@ -285,6 +300,7 @@ module triangle_monitor (
         int x;
         int y;
         real coverage;
+        real color_coverage;
 
         string cvg_sample;       
 
@@ -303,21 +319,24 @@ module triangle_monitor (
 
         // Print total coverage
         coverage = cvg_grp.size() / real'(EXP_DRAW_REGIONS);
-
+        color_coverage = colors_drawn.size() / real'(EXP_DRAW_COLORS);
 
         $display("The following test bins have been hit");
         foreach (cvg_grp[i]) begin
             $display(" - %s", i);
         end
 
-        if (coverage == 1.0) begin
-            $display("Test input coverage = %0.5f%%", coverage*100);
-        end else begin
+        $display("Reached %0d/%0d bins. Coverage=%0.5f%%", cvg_grp.size(), EXP_DRAW_REGIONS, coverage*100);
+        if (coverage != 1.0) begin
             ERROR_COUNT += 1;
-            $error("Test input coverage = %0.5f%%", coverage*100);
         end
-    endfunction
 
+        $display("Reached %0d/%0d colors. Coverage=%0.5f%%", colors_drawn.size(), EXP_DRAW_COLORS, color_coverage*100);
+        if (color_coverage != 1.0) begin
+            ERROR_COUNT += 1;
+        end
+
+    endfunction
 
     function radius_type_e get_radius_type(int radius);
         if (radius <= 10)
@@ -375,6 +394,26 @@ module triangle_monitor (
             return 1'b1;
         else
             return 1'b0;
+    endfunction
+
+    // Top Level coverage
+    function void report_top();
+        report_coverage_top();
+    endfunction 
+
+    function void report_coverage_top();
+
+        // For top level, we just ensure that all pixels have been hit
+        real coverage;
+
+        // Print total coverage
+        coverage = pixels_drawn.size() / real'(EXP_PIXELS_DRAWN);
+
+        $display("Reached %0d/%0d pixels. Coverage=%0.5f%%", pixels_drawn.size(), EXP_PIXELS_DRAWN, coverage*100);
+        if (coverage != 1.0) begin
+            ERROR_COUNT += 1;
+        end
+        
     endfunction
 
 endmodule // triangle_monitor

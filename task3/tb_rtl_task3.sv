@@ -85,7 +85,7 @@ module tb_rtl_task3();
     initial begin
         @(phases.report_phase == 1) begin
             // Accumulate errors from all monitors and report
-            circle_monitor.report();
+            circle_monitor.report_top();
 
             ERROR_COUNT += circle_monitor.ERROR_COUNT; // High level monitor failures
             ERROR_COUNT += test_seq.ERROR_COUNT;       // Tightly coupled test checks
