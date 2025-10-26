@@ -14,3 +14,11 @@ It is highly recommended that you each work individually on this specific task. 
 ## Contributions made by glin05
 - co-designed fillscreen module level
 - created TB templates
+
+## Files for raw design
+There are many files in this design that are for the testbench only and here is the list of files that relevant to the design
+- lab_pkg.sv
+- fillscreen.sv
+- statemachine.sv
+- task2.sv
+- vga_* for vga adapter

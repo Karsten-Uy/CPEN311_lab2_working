@@ -42,20 +42,6 @@ set_global_assignment -name TOP_LEVEL_ENTITY task4
 set_global_assignment -name ORIGINAL_QUARTUS_VERSION 18.1.0
 set_global_assignment -name PROJECT_CREATION_TIME_DATE "09:07:59  OCTOBER 16, 2025"
 set_global_assignment -name LAST_QUARTUS_VERSION "18.1.0 Lite Edition"
-set_global_assignment -name SYSTEMVERILOG_FILE verif_components/lab_pkg.sv
-set_global_assignment -name SYSTEMVERILOG_FILE "../vga-core/vga_pll.sv"
-set_global_assignment -name SYSTEMVERILOG_FILE "../vga-core/vga_controller.sv"
-set_global_assignment -name SYSTEMVERILOG_FILE "../vga-core/vga_address_translator.sv"
-set_global_assignment -name SYSTEMVERILOG_FILE "../vga-core/vga_adapter.sv"
-set_global_assignment -name SYSTEMVERILOG_FILE task4.sv
-set_global_assignment -name SYSTEMVERILOG_FILE reuleaux_fsm.sv
-set_global_assignment -name SYSTEMVERILOG_FILE reuleaux.sv
-set_global_assignment -name SYSTEMVERILOG_FILE phases.sv
-set_global_assignment -name SYSTEMVERILOG_FILE fillscreen_fsm.sv
-set_global_assignment -name SYSTEMVERILOG_FILE fillscreen.sv
-set_global_assignment -name SYSTEMVERILOG_FILE circle_fsm.sv
-set_global_assignment -name SYSTEMVERILOG_FILE circle_datapath.sv
-set_global_assignment -name SYSTEMVERILOG_FILE circle.sv
 set_global_assignment -name PROJECT_OUTPUT_DIRECTORY output_files
 set_global_assignment -name BOARD "DE1-SoC Board"
 set_global_assignment -name EDA_SIMULATION_TOOL "ModelSim-Altera (Verilog)"
@@ -322,4 +308,21 @@ set_location_assignment PIN_D11 -to VGA_VS
 set_global_assignment -name PARTITION_NETLIST_TYPE SOURCE -section_id Top
 set_global_assignment -name PARTITION_FITTER_PRESERVATION_LEVEL PLACEMENT_AND_ROUTING -section_id Top
 set_global_assignment -name PARTITION_COLOR 16764057 -section_id Top
+set_global_assignment -name MIN_CORE_JUNCTION_TEMP 0
+set_global_assignment -name MAX_CORE_JUNCTION_TEMP 85
+set_global_assignment -name POWER_PRESET_COOLING_SOLUTION "23 MM HEAT SINK WITH 200 LFPM AIRFLOW"
+set_global_assignment -name POWER_BOARD_THERMAL_MODEL "NONE (CONSERVATIVE)"
+set_global_assignment -name SYSTEMVERILOG_FILE lab_pkg.sv
+set_global_assignment -name SYSTEMVERILOG_FILE "../vga-core/vga_pll.sv"
+set_global_assignment -name SYSTEMVERILOG_FILE "../vga-core/vga_controller.sv"
+set_global_assignment -name SYSTEMVERILOG_FILE "../vga-core/vga_address_translator.sv"
+set_global_assignment -name SYSTEMVERILOG_FILE "../vga-core/vga_adapter.sv"
+set_global_assignment -name SYSTEMVERILOG_FILE task4.sv
+set_global_assignment -name SYSTEMVERILOG_FILE reuleaux_fsm.sv
+set_global_assignment -name SYSTEMVERILOG_FILE reuleaux.sv
+set_global_assignment -name SYSTEMVERILOG_FILE fillscreen_fsm.sv
+set_global_assignment -name SYSTEMVERILOG_FILE fillscreen.sv
+set_global_assignment -name SYSTEMVERILOG_FILE circle_fsm.sv
+set_global_assignment -name SYSTEMVERILOG_FILE circle_datapath.sv
+set_global_assignment -name SYSTEMVERILOG_FILE circle.sv
 set_instance_assignment -name PARTITION_HIERARCHY root_partition -to | -section_id Top

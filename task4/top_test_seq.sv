@@ -35,8 +35,6 @@ module top_test_seq (
 
     task run();
 
-        // test_default(); 
-
         vif.KEY[0] = 1'b1;        
         wait_done_and_deassert(); 
 
@@ -51,22 +49,5 @@ module top_test_seq (
         repeat($urandom_range(10,20)) @(posedge vif.CLOCK_50);
 
     endtask
-
-    // task test_default();
-    
-    //     vif.KEY[0] = 1'b1;
-    //     // wait_done_and_deassert(); 
-
-    //     @(vif.LEDR[0]);
-
-    //     repeat($urandom_range(0,20)) @(posedge vif.CLOCK_50);
-    //     vif.KEY[0] = 1'b0;
-
-    //     // Wait some random time before next start
-    //     repeat($urandom_range(10,20)) @(posedge vif.CLOCK_50);
-
-
-    // endtask
-
 
 endmodule // top_test_seq

@@ -51,6 +51,12 @@ module tb_syn_task4();
     assign dut_triangle_if.centre_y   = 8'd60;
     assign dut_triangle_if.colour = 3'd2;
 
+    assign dut_triangle_if.done        = dut_if.LEDR[0];
+    assign dut_triangle_if.vga_x       = dut_if.VGA_X;
+    assign dut_triangle_if.vga_y       = dut_if.VGA_Y;
+    assign dut_triangle_if.vga_colour  = dut_if.VGA_COLOUR;
+    assign dut_triangle_if.vga_plot    = dut_if.VGA_PLOT;
+
     // -------------------- RUNNING TEST AND COLLECT COVERAGE --------------------
     int ERROR_COUNT = 0;
 
@@ -76,8 +82,8 @@ module tb_syn_task4();
 
     initial begin
         @(phases.report_phase == 1) begin
-            // // Accumulate errors from all monitors and report
-            // circle_monitor.report();
+            // Accumulate errors from all monitors and report
+            triangle_monitor.report_top();
 
             ERROR_COUNT += triangle_monitor.ERROR_COUNT; // High level monitor failures
             ERROR_COUNT += test_seq.ERROR_COUNT;       // Tightly coupled test checks

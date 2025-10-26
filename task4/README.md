@@ -22,3 +22,16 @@ List of contributions made by members of the team.
     - test coverage
     - test sequence
 - debugging design
+
+## Files for raw design
+There are many files in this design that are for the testbench only and here is the list of files that relevant to the design
+- lab_pkg.sv
+- reuleaux_fsm.sv
+- reuleaux.sv
+- fillscreen_fsm.sv
+- fillscreen.sv
+- circle_fsm.sv
+- circle.sv
+- circle_datapath.sv
+- task4.sv
+- vga_* for vga adapter

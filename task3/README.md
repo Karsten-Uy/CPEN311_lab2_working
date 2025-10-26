@@ -22,3 +22,13 @@ List of contributions made by members of the team.
 - created datapath module
 - debugging design
 
+## Files for raw design
+There are many files in this design that are for the testbench only and here is the list of files that relevant to the design
+- lab_pkg.sv
+- fillscreen_fsm.sv
+- fillscreen.sv
+- datapath.sv
+- circle_fsm.sv
+- circle.sv
+- task3.sv
+- vga_* for vga adapter

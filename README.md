@@ -1,4 +1,10 @@
 [![Review Assignment Due Date](https://classroom.github.com/assets/deadline-readme-button-22041afd0340ce965d47ae6ef1cefeee28c7c493a6346c4f15d667ab976d596c.svg)](https://classroom.github.com/a/647beX0Q)
+
+# NOTE TO MARKER:
+- To successfully compile the design, the lab_pkg.sv file must be compiled before the other source files. On the first attempt, some files may fail because they depend on this package. If you encounter errors in ModelSim, run Compile All again and the second pass will compile everything correctly once lab_pkg.sv is in place.
+- the list of files that just the design for task2, task3, and task4 are in the README files in the respective folders.
+- Some of our tests are very exhastive and take a while to run on my local machine (~5min) to ensure optimal coverage. They might take a while but they WILL FINISH, thank you for your patience when marking.
+
 # Lab 2: Circles and Triangles
 
 ## Contents
