@@ -33,7 +33,6 @@ module tb_rtl_fillscreen();
         .vga_plot      (dut_if.vga_plot)
     );
 
-    // // NOTE: cannot do for GLS
     assign dut_fsm_if.state      = DUT.FSM.state;
     assign dut_fsm_if.clk        = DUT.FSM.clk;
     assign dut_fsm_if.rst_n      = DUT.FSM.rst_n;
@@ -76,6 +75,7 @@ module tb_rtl_fillscreen();
 
     initial begin
         @(TEST_DONE) begin
+            
             // Accumulate errors from all monitors and report
             monitor.report();
             fsm_monitor.report();
