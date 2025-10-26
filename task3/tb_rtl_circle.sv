@@ -1,7 +1,5 @@
 module tb_rtl_circle();
 
-    // Your testbench goes here. Our toplevel will give up after 1,000,000 ticks.
-
     import lab_pkg::*;
 
     // --------------------  VERIFICATION COMPONENTS --------------------
@@ -30,8 +28,6 @@ module tb_rtl_circle();
         .vga_colour   (dut_if.vga_colour),
         .vga_plot     (dut_if.vga_plot)
     );
-
-    // assign dut_if.state = DUT.FSM.state;
 
     // -------------------- RUNNING TEST AND COLLECT COVERAGE --------------------
     int ERROR_COUNT = 0;
@@ -81,4 +77,5 @@ module tb_rtl_circle();
             $stop;
         end
     end
+
 endmodule: tb_rtl_circle

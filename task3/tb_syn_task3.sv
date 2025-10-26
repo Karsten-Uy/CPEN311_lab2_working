@@ -15,7 +15,7 @@ module tb_syn_task3();
     top_test_seq test_seq (.vif(dut_if), .phases(phases));
 
     // --------------------  DUT INSTANTIATION --------------------
-    task3_gls DUT (
+    task3 DUT (
         .CLOCK_50   (dut_if.CLOCK_50),
         .KEY        (dut_if.KEY),
         .SW         (dut_if.SW),
@@ -59,6 +59,8 @@ module tb_syn_task3();
     // -------------------- RUNNING TEST AND COLLECT COVERAGE --------------------
     int ERROR_COUNT = 0;
 
+
+
     initial begin
         // Treat as run_phase()
         fork
@@ -83,7 +85,7 @@ module tb_syn_task3();
     initial begin
         @(phases.report_phase == 1) begin
             // Accumulate errors from all monitors and report
-            circle_monitor.report();
+            circle_monitor.report_top();
 
             ERROR_COUNT += circle_monitor.ERROR_COUNT; // High level monitor failures
             ERROR_COUNT += test_seq.ERROR_COUNT;       // Tightly coupled test checks
